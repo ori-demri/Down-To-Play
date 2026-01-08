@@ -1,0 +1,52 @@
+{
+  "expo": {
+    "name": "Down To Play",
+    "slug": "down-to-play",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#1a472a"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.yourcompany.downtoplay",
+      "config": {
+        "googleMapsApiKey": "YOUR_GOOGLE_MAPS_API_KEY_IOS"
+      },
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "We need your location to show nearby players and courts.",
+        "NSLocationAlwaysAndWhenInUseUsageDescription": "We need your location to show nearby players and courts."
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#1a472a"
+      },
+      "package": "com.yourcompany.downtoplay",
+      "config": {
+        "googleMaps": {
+          "apiKey": "YOUR_GOOGLE_MAPS_API_KEY_ANDROID"
+        }
+      },
+      "permissions": [
+        "ACCESS_COARSE_LOCATION",
+        "ACCESS_FINE_LOCATION"
+      ]
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "scheme": "downtoplay",
+    "plugins": [
+      "expo-secure-store"
+    ]
+  }
+}
