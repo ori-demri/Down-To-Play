@@ -1,23 +1,18 @@
-import React, { useEffect } from 'react';
-import { StatusBar } from 'expo-status-bar';
+import React from 'react';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { NavigationContainer } from '@react-navigation/native';
-import RootNavigator from './src/navigation/RootNavigator';
-import { useAuthStore } from './src/stores/authStore';
+import { MapScreen } from './src/screens/MapScreen';
+import { ErrorBoundary } from './src/components/ErrorBoundary';
 
+/**
+ * Root App component
+ * Simple map-focused app without authentication
+ */
 export default function App() {
-  const initializeAuth = useAuthStore((state) => state.initialize);
-
-  useEffect(() => {
-    initializeAuth();
-  }, []);
-
   return (
-    <SafeAreaProvider>
-      <NavigationContainer>
-        <RootNavigator />
-        <StatusBar style="auto" />
-      </NavigationContainer>
-    </SafeAreaProvider>
+    <ErrorBoundary>
+      <SafeAreaProvider>
+        <MapScreen />
+      </SafeAreaProvider>
+    </ErrorBoundary>
   );
 }
