@@ -1,6 +1,6 @@
 /**
  * Production-ready logging utility for React Native
- * 
+ *
  * Features:
  * - Log levels (debug, info, warn, error)
  * - Contextual logging with tags
@@ -25,13 +25,13 @@ const isDevelopment = __DEV__;
 const DEFAULT_LOG_LEVEL = isDevelopment ? LogLevel.DEBUG : LogLevel.WARN;
 
 // Current log level (can be changed at runtime)
-let currentLogLevel: LogLevel = DEFAULT_LOG_LEVEL;
+const currentLogLevel: LogLevel = DEFAULT_LOG_LEVEL;
 
 // Log colors for console output (development only)
 const LOG_COLORS: Record<number, string> = {
   [LogLevel.DEBUG]: '\x1b[36m', // Cyan
-  [LogLevel.INFO]: '\x1b[32m',  // Green
-  [LogLevel.WARN]: '\x1b[33m',  // Yellow
+  [LogLevel.INFO]: '\x1b[32m', // Green
+  [LogLevel.WARN]: '\x1b[33m', // Yellow
   [LogLevel.ERROR]: '\x1b[31m', // Red
 };
 
@@ -65,6 +65,7 @@ function formatMessage(level: LogLevel, tag: string, message: string, data?: unk
 /**
  * Core logging function
  */
+/* eslint-disable no-console */
 function log(level: LogLevel, tag: string, message: string, data?: unknown): void {
   if (level < currentLogLevel) {
     return;
@@ -75,12 +76,13 @@ function log(level: LogLevel, tag: string, message: string, data?: unknown): voi
   // In development, use colored console output
   if (isDevelopment) {
     const color = LOG_COLORS[level];
-    const logFn = level === LogLevel.ERROR 
-      ? console.error 
-      : level === LogLevel.WARN 
-        ? console.warn 
-        : console.log;
-    
+    const logFn =
+      level === LogLevel.ERROR
+        ? console.error
+        : level === LogLevel.WARN
+          ? console.warn
+          : console.log;
+
     logFn(`${color}${formattedMessage}${RESET_COLOR}`);
   } else {
     // In production, only log warnings and errors
@@ -89,6 +91,7 @@ function log(level: LogLevel, tag: string, message: string, data?: unknown): voi
       logFn(formattedMessage);
     }
   }
+  /* eslint-enable no-console */
 
   // Here you could add integration with crash reporting services like:
   // - Sentry
@@ -103,7 +106,7 @@ function log(level: LogLevel, tag: string, message: string, data?: unknown): voi
 /**
  * Create a logger instance with a specific tag
  * This is the recommended way to use the logger in your code
- * 
+ *
  * @example
  * ```typescript
  * const logger = createLogger('AuthService');

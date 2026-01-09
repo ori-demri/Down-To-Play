@@ -1,7 +1,7 @@
 import React, { useState, useCallback, memo } from 'react';
 import { View, StyleSheet } from 'react-native';
-import { Marker } from 'react-native-maps';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { Marker } from 'react-native-maps';
 import { Field, SurfaceType } from '@/types';
 
 interface FieldMarkerProps {
@@ -33,7 +33,9 @@ const getSurfaceColor = (surfaceType: SurfaceType): string => {
 };
 
 // Get icon name based on surface type
-const getSurfaceIconName = (surfaceType: SurfaceType): keyof typeof MaterialCommunityIcons.glyphMap => {
+const getSurfaceIconName = (
+  surfaceType: SurfaceType
+): keyof typeof MaterialCommunityIcons.glyphMap => {
   switch (surfaceType) {
     case 'natural_grass':
     case 'synthetic_turf':
@@ -57,17 +59,17 @@ function FieldMarkerComponent({ field, isSelected = false, onPress }: FieldMarke
   const [tracksChanges, setTracksChanges] = useState(true);
   const markerColor = getSurfaceColor(field.surface_type);
   const iconName = getSurfaceIconName(field.surface_type);
-  
+
   // Memoize the press handler to prevent unnecessary re-renders
   const handlePress = useCallback(() => {
     onPress(field);
   }, [field, onPress]);
-  
+
   // Delay turning off tracksViewChanges to ensure icon renders
   const handleLayout = useCallback(() => {
     setTimeout(() => setTracksChanges(false), 500);
   }, []);
-  
+
   return (
     <Marker
       coordinate={field.coordinates}
@@ -77,27 +79,24 @@ function FieldMarkerComponent({ field, isSelected = false, onPress }: FieldMarke
       onLayout={handleLayout}
     >
       <View style={styles.markerWrapper}>
-        <View style={[
-          styles.markerContainer,
-          isSelected && styles.markerContainerSelected,
-        ]}>
-          <View style={[
-            styles.iconBackground,
-            { backgroundColor: markerColor },
-            isSelected && styles.iconBackgroundSelected,
-          ]}>
-            <MaterialCommunityIcons 
-              name={iconName} 
-              size={isSelected ? 16 : 14} 
-              color="#FFFFFF" 
-            />
+        <View style={[styles.markerContainer, isSelected && styles.markerContainerSelected]}>
+          <View
+            style={[
+              styles.iconBackground,
+              { backgroundColor: markerColor },
+              isSelected && styles.iconBackgroundSelected,
+            ]}
+          >
+            <MaterialCommunityIcons name={iconName} size={isSelected ? 16 : 14} color="#FFFFFF" />
           </View>
         </View>
-        <View style={[
-          styles.pointer,
-          { borderTopColor: markerColor },
-          isSelected && styles.pointerSelected,
-        ]} />
+        <View
+          style={[
+            styles.pointer,
+            { borderTopColor: markerColor },
+            isSelected && styles.pointerSelected,
+          ]}
+        />
       </View>
     </Marker>
   );
@@ -113,47 +112,47 @@ export const FieldMarker = memo(FieldMarkerComponent, (prevProps, nextProps) => 
 });
 
 const styles = StyleSheet.create({
-  markerWrapper: {
+  iconBackground: {
     alignItems: 'center',
+    borderRadius: 12,
+    height: 24,
+    justifyContent: 'center',
+    width: 24,
+  },
+  iconBackgroundSelected: {
+    borderRadius: 14,
+    height: 28,
+    width: 28,
   },
   markerContainer: {
     backgroundColor: '#FFFFFF',
     borderRadius: 14,
+    elevation: 3,
     padding: 2,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.2,
     shadowRadius: 2,
-    elevation: 3,
   },
   markerContainerSelected: {
+    elevation: 5,
     padding: 3,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.3,
     shadowRadius: 3,
-    elevation: 5,
   },
-  iconBackground: {
-    width: 24,
-    height: 24,
-    borderRadius: 12,
-    justifyContent: 'center',
+  markerWrapper: {
     alignItems: 'center',
   },
-  iconBackgroundSelected: {
-    width: 28,
-    height: 28,
-    borderRadius: 14,
-  },
   pointer: {
-    width: 0,
-    height: 0,
+    borderLeftColor: 'transparent',
     borderLeftWidth: 5,
+    borderRightColor: 'transparent',
     borderRightWidth: 5,
     borderTopWidth: 6,
-    borderLeftColor: 'transparent',
-    borderRightColor: 'transparent',
+    height: 0,
     marginTop: -1,
+    width: 0,
   },
   pointerSelected: {
     borderLeftWidth: 6,

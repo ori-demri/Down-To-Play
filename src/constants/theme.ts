@@ -4,27 +4,27 @@ export const colors = {
   primary: '#10B981', // Emerald green - represents grass/football
   primaryDark: '#059669',
   primaryLight: '#34D399',
-  
+
   secondary: '#3B82F6', // Blue for accents
   secondaryDark: '#2563EB',
-  
+
   background: '#FFFFFF',
   surface: '#F9FAFB',
-  
+
   text: {
     primary: '#111827',
     secondary: '#6B7280',
     muted: '#9CA3AF',
     inverse: '#FFFFFF',
   },
-  
+
   border: '#E5E7EB',
-  
+
   success: '#10B981',
   warning: '#F59E0B',
   error: '#EF4444',
   info: '#3B82F6',
-  
+
   map: {
     fieldMarker: '#10B981',
     selectedMarker: '#059669',

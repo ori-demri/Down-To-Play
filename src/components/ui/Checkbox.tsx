@@ -10,13 +10,7 @@ interface CheckboxProps {
   icon?: string;
 }
 
-export function Checkbox({
-  label,
-  checked,
-  onToggle,
-  disabled = false,
-  icon,
-}: CheckboxProps) {
+export function Checkbox({ label, checked, onToggle, disabled = false, icon }: CheckboxProps) {
   return (
     <TouchableOpacity
       style={[styles.container, disabled && styles.disabled]}
@@ -34,23 +28,15 @@ export function Checkbox({
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: spacing.sm,
-  },
-  disabled: {
-    opacity: 0.5,
-  },
   checkbox: {
-    width: 24,
-    height: 24,
+    alignItems: 'center',
+    backgroundColor: colors.background,
+    borderColor: colors.border,
     borderRadius: borderRadius.sm,
     borderWidth: 2,
-    borderColor: colors.border,
-    backgroundColor: colors.background,
-    alignItems: 'center',
+    height: 24,
     justifyContent: 'center',
+    width: 24,
   },
   checkboxChecked: {
     backgroundColor: colors.primary,
@@ -61,15 +47,23 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: typography.weights.bold,
   },
+  container: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    paddingVertical: spacing.sm,
+  },
+  disabled: {
+    opacity: 0.5,
+  },
   icon: {
     fontSize: 18,
     marginLeft: spacing.sm,
   },
   label: {
-    fontSize: typography.sizes.md,
     color: colors.text.primary,
-    marginLeft: spacing.sm,
     flex: 1,
+    fontSize: typography.sizes.md,
+    marginLeft: spacing.sm,
   },
   labelDisabled: {
     color: colors.text.muted,

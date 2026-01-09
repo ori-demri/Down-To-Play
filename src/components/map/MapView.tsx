@@ -1,8 +1,8 @@
 import React, { useRef, useCallback, useState, useEffect, memo } from 'react';
 import { StyleSheet, View, ActivityIndicator, Text, TouchableOpacity } from 'react-native';
 import RNMapView, { Region } from 'react-native-maps';
-import { Field, Coordinates } from '@/types';
 import { colors, spacing, borderRadius, typography, MAP_CONFIG } from '@/constants';
+import { Field, Coordinates } from '@/types';
 import { FieldMarker } from './FieldMarker';
 
 interface MapViewProps {
@@ -28,11 +28,14 @@ function MapViewComponent({
   // Center map on user location when it becomes available
   useEffect(() => {
     if (userLocation && isMapReady && mapRef.current) {
-      mapRef.current.animateToRegion({
-        latitude: userLocation.latitude,
-        longitude: userLocation.longitude,
-        ...MAP_CONFIG.userLocationDelta,
-      }, 1000);
+      mapRef.current.animateToRegion(
+        {
+          latitude: userLocation.latitude,
+          longitude: userLocation.longitude,
+          ...MAP_CONFIG.userLocationDelta,
+        },
+        1000
+      );
     }
   }, [userLocation, isMapReady]);
 
@@ -42,17 +45,23 @@ function MapViewComponent({
 
   const handleCenterOnUser = useCallback(() => {
     if (userLocation && mapRef.current) {
-      mapRef.current.animateToRegion({
-        latitude: userLocation.latitude,
-        longitude: userLocation.longitude,
-        ...MAP_CONFIG.userLocationDelta,
-      }, 500);
+      mapRef.current.animateToRegion(
+        {
+          latitude: userLocation.latitude,
+          longitude: userLocation.longitude,
+          ...MAP_CONFIG.userLocationDelta,
+        },
+        500
+      );
     }
   }, [userLocation]);
 
-  const handleRegionChangeComplete = useCallback((region: Region) => {
-    onRegionChange?.(region);
-  }, [onRegionChange]);
+  const handleRegionChangeComplete = useCallback(
+    (region: Region) => {
+      onRegionChange?.(region);
+    },
+    [onRegionChange]
+  );
 
   const initialRegion = userLocation
     ? {
@@ -110,55 +119,55 @@ function MapViewComponent({
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  map: {
-    flex: 1,
-  },
   centerButton: {
+    alignItems: 'center',
+    backgroundColor: colors.background,
+    borderRadius: 24,
+    bottom: spacing.xl,
+    elevation: 4,
+    height: 48,
+    justifyContent: 'center',
     position: 'absolute',
     right: spacing.md,
-    bottom: spacing.xl,
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    backgroundColor: colors.background,
-    justifyContent: 'center',
-    alignItems: 'center',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
     shadowRadius: 4,
-    elevation: 4,
+    width: 48,
   },
   centerButtonIcon: {
     fontSize: 20,
   },
-  loadingOverlay: {
-    position: 'absolute',
-    top: spacing.xl,
-    left: 0,
-    right: 0,
-    alignItems: 'center',
+  container: {
+    flex: 1,
   },
   loadingContainer: {
-    flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: colors.background,
-    paddingVertical: spacing.sm,
-    paddingHorizontal: spacing.md,
     borderRadius: borderRadius.full,
+    elevation: 3,
+    flexDirection: 'row',
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
-    elevation: 3,
+  },
+  loadingOverlay: {
+    alignItems: 'center',
+    left: 0,
+    position: 'absolute',
+    right: 0,
+    top: spacing.xl,
   },
   loadingText: {
-    marginLeft: spacing.sm,
-    fontSize: typography.sizes.sm,
     color: colors.text.secondary,
+    fontSize: typography.sizes.sm,
+    marginLeft: spacing.sm,
+  },
+  map: {
+    flex: 1,
   },
 });
 

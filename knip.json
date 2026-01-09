@@ -3,5 +3,6 @@
   "entry": ["App.tsx"],
   "project": ["src/**/*.{ts,tsx}"],
   "ignore": ["babel.config.js"],
-  "ignoreDependencies": ["babel-plugin-module-resolver", "babel-preset-expo"]
+  "ignoreDependencies": ["babel-plugin-module-resolver", "babel-preset-expo"],
+  "ignoreBinaries": ["expo-doctor"]
 }

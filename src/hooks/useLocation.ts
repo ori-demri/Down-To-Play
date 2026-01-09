@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import * as Location from 'expo-location';
-import { Coordinates } from '@/types';
 import { LOCATION_CONFIG } from '@/constants';
+import { Coordinates } from '@/types';
 import { mapLogger } from '@/utils/logger';
 
 interface LocationState {
@@ -28,12 +28,12 @@ export function useLocation(): UseLocationReturn {
   const requestPermission = useCallback(async (): Promise<boolean> => {
     try {
       const { status } = await Location.requestForegroundPermissionsAsync();
-      setState(prev => ({ ...prev, permissionStatus: status }));
+      setState((prev) => ({ ...prev, permissionStatus: status }));
       mapLogger.debug('Location permission status', { status });
       return status === 'granted';
     } catch (error) {
-      mapLogger.error('Error requesting location permission', { 
-        error: error instanceof Error ? error.message : String(error) 
+      mapLogger.error('Error requesting location permission', {
+        error: error instanceof Error ? error.message : String(error),
       });
       return false;
     }
@@ -41,7 +41,7 @@ export function useLocation(): UseLocationReturn {
 
   const getCurrentLocation = useCallback(async (): Promise<Coordinates | null> => {
     try {
-      setState(prev => ({ ...prev, isLoading: true, error: null }));
+      setState((prev) => ({ ...prev, isLoading: true, error: null }));
 
       const location = await Location.getCurrentPositionAsync({
         accuracy: Location.Accuracy.Balanced,
@@ -53,7 +53,7 @@ export function useLocation(): UseLocationReturn {
         longitude: location.coords.longitude,
       };
 
-      setState(prev => ({
+      setState((prev) => ({
         ...prev,
         coordinates,
         isLoading: false,
@@ -63,7 +63,7 @@ export function useLocation(): UseLocationReturn {
       return coordinates;
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Failed to get location';
-      setState(prev => ({
+      setState((prev) => ({
         ...prev,
         isLoading: false,
         error: errorMessage,
@@ -77,7 +77,7 @@ export function useLocation(): UseLocationReturn {
     if (hasPermission) {
       await getCurrentLocation();
     } else {
-      setState(prev => ({
+      setState((prev) => ({
         ...prev,
         isLoading: false,
         error: 'Location permission denied',
@@ -88,6 +88,7 @@ export function useLocation(): UseLocationReturn {
   // Initial location fetch on mount
   useEffect(() => {
     refreshLocation();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return {

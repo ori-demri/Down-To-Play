@@ -1,11 +1,12 @@
-import * as ImagePicker from 'expo-image-picker';
-import * as FileSystem from 'expo-file-system/legacy';
 import { decode } from 'base64-arraybuffer';
+import * as FileSystem from 'expo-file-system/legacy';
+import * as ImagePicker from 'expo-image-picker';
 import { supabase, STORAGE_BUCKETS } from '@/infrastructure/supabase';
-import { SelectedImage } from '../types';
 import { storageLogger } from '@/utils/logger';
+import { SelectedImage } from '../types';
 
-// Maximum image size in bytes (5MB)
+// Maximum image size in bytes (5MB) - TODO: implement size validation
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const MAX_IMAGE_SIZE = 5 * 1024 * 1024;
 
 // Allowed image types
@@ -67,8 +68,8 @@ class ImageService {
       const asset = result.assets[0];
       return this.processPickedImage(asset);
     } catch (error) {
-      storageLogger.error('Error picking image from gallery', { 
-        error: error instanceof Error ? error.message : String(error) 
+      storageLogger.error('Error picking image from gallery', {
+        error: error instanceof Error ? error.message : String(error),
       });
       return {
         success: false,
@@ -103,8 +104,8 @@ class ImageService {
       const asset = result.assets[0];
       return this.processPickedImage(asset);
     } catch (error) {
-      storageLogger.error('Error taking photo', { 
-        error: error instanceof Error ? error.message : String(error) 
+      storageLogger.error('Error taking photo', {
+        error: error instanceof Error ? error.message : String(error),
       });
       return {
         success: false,
@@ -121,7 +122,7 @@ class ImageService {
   ): Promise<ImagePickerResult> {
     const uri = asset.uri;
     const mimeType = asset.mimeType || 'image/jpeg';
-    
+
     // Validate mime type
     if (!ALLOWED_MIME_TYPES.includes(mimeType)) {
       return {
@@ -202,8 +203,8 @@ class ImageService {
         url: urlData.publicUrl,
       };
     } catch (error) {
-      storageLogger.error('Error uploading image', { 
-        error: error instanceof Error ? error.message : String(error) 
+      storageLogger.error('Error uploading image', {
+        error: error instanceof Error ? error.message : String(error),
       });
       return {
         success: false,
@@ -227,7 +228,7 @@ class ImageService {
 
     for (let i = 0; i < images.length; i++) {
       const result = await this.uploadImage(images[i], fieldId, userId);
-      
+
       if (result.success && result.url) {
         urls.push(result.url);
       } else {
@@ -250,8 +251,8 @@ class ImageService {
       // Extract the path from the URL
       const url = new URL(imageUrl);
       const pathParts = url.pathname.split('/');
-      const bucketIndex = pathParts.findIndex(p => p === STORAGE_BUCKETS.FIELD_IMAGES);
-      
+      const bucketIndex = pathParts.findIndex((p) => p === STORAGE_BUCKETS.FIELD_IMAGES);
+
       if (bucketIndex === -1) {
         storageLogger.warn('Invalid image URL - bucket not found', { imageUrl });
         return false;
@@ -271,8 +272,8 @@ class ImageService {
       storageLogger.debug('Image deleted successfully', { storagePath });
       return true;
     } catch (error) {
-      storageLogger.error('Error deleting image', { 
-        error: error instanceof Error ? error.message : String(error) 
+      storageLogger.error('Error deleting image', {
+        error: error instanceof Error ? error.message : String(error),
       });
       return false;
     }

@@ -1,14 +1,14 @@
 import { useState, useCallback } from 'react';
 import { Alert } from 'react-native';
+import { Coordinates } from '@/types';
+import { fieldLogger } from '@/utils/logger';
+import { fieldRepository } from '../repositories/fieldRepository';
 import {
   CreateFieldFormData,
   CreateFieldFormErrors,
   SelectedImage,
   DEFAULT_FORM_DATA,
 } from '../types';
-import { fieldRepository } from '../repositories/fieldRepository';
-import { Coordinates } from '@/types';
-import { fieldLogger } from '@/utils/logger';
 
 interface UseCreateFieldReturn {
   formData: CreateFieldFormData;
@@ -41,31 +41,34 @@ export function useCreateField(): UseCreateFieldReturn {
     setValidationError(null);
   }, []);
 
-  const updateFormData = useCallback(<K extends keyof CreateFieldFormData>(
-    key: K,
-    value: CreateFieldFormData[K]
-  ) => {
-    setFormData(prev => ({ ...prev, [key]: value }));
-    // Clear error when field is updated
-    if (errors[key as keyof CreateFieldFormErrors]) {
-      setErrors(prev => {
-        const newErrors = { ...prev };
-        delete newErrors[key as keyof CreateFieldFormErrors];
-        return newErrors;
-      });
-    }
-  }, [errors]);
+  const updateFormData = useCallback(
+    <K extends keyof CreateFieldFormData>(key: K, value: CreateFieldFormData[K]) => {
+      setFormData((prev) => ({ ...prev, [key]: value }));
+      // Clear error when field is updated
+      if (errors[key as keyof CreateFieldFormErrors]) {
+        setErrors((prev) => {
+          const newErrors = { ...prev };
+          delete newErrors[key as keyof CreateFieldFormErrors];
+          return newErrors;
+        });
+      }
+    },
+    [errors]
+  );
 
-  const setCoordinates = useCallback((coordinates: Coordinates) => {
-    setFormData(prev => ({ ...prev, coordinates }));
-    if (errors.coordinates) {
-      setErrors(prev => {
-        const newErrors = { ...prev };
-        delete newErrors.coordinates;
-        return newErrors;
-      });
-    }
-  }, [errors]);
+  const setCoordinates = useCallback(
+    (coordinates: Coordinates) => {
+      setFormData((prev) => ({ ...prev, coordinates }));
+      if (errors.coordinates) {
+        setErrors((prev) => {
+          const newErrors = { ...prev };
+          delete newErrors.coordinates;
+          return newErrors;
+        });
+      }
+    },
+    [errors]
+  );
 
   const validateForm = useCallback((): boolean => {
     const newErrors: CreateFieldFormErrors = {};
@@ -108,65 +111,65 @@ export function useCreateField(): UseCreateFieldReturn {
     }
 
     setErrors(newErrors);
-    
+
     // Set validation error message for snackbar (show first error)
     if (errorMessages.length > 0) {
       setValidationError(errorMessages[0]);
     }
-    
+
     return Object.keys(newErrors).length === 0;
   }, [formData, images]);
 
-  const submitForm = useCallback(async (userId: string | null): Promise<boolean> => {
-    if (!validateForm()) {
-      return false;
-    }
-
-    setIsSubmitting(true);
-    setUploadProgress(0);
-
-    try {
-      const result = await fieldRepository.createField(
-        formData,
-        images,
-        userId,
-        setUploadProgress
-      );
-
-      if (result.success) {
-        // Show success message
-        Alert.alert(
-          'Field Submitted! 🎉',
-          'Thank you for contributing! Your field has been submitted for review and will be visible once approved.',
-          [{ text: 'OK' }]
-        );
-
-        // Show any upload warnings
-        if (result.errors && result.errors.length > 0) {
-          fieldLogger.warn('Some images failed to upload', { errors: result.errors });
-        }
-
-        fieldLogger.info('Field created successfully', { fieldId: result.field?.id });
-        return true;
-      } else {
-        const errorMessage = result.error || 'Failed to create field';
-        setErrors({ general: errorMessage });
-        Alert.alert(
-          'Submission Failed',
-          errorMessage,
-          [{ text: 'OK' }]
-        );
+  const submitForm = useCallback(
+    async (userId: string | null): Promise<boolean> => {
+      if (!validateForm()) {
         return false;
       }
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred';
-      setErrors({ general: errorMessage });
-      Alert.alert('Error', errorMessage, [{ text: 'OK' }]);
-      return false;
-    } finally {
-      setIsSubmitting(false);
-    }
-  }, [formData, images, validateForm]);
+
+      setIsSubmitting(true);
+      setUploadProgress(0);
+
+      try {
+        const result = await fieldRepository.createField(
+          formData,
+          images,
+          userId,
+          setUploadProgress
+        );
+
+        if (result.success) {
+          // Show success message
+          Alert.alert(
+            'Field Submitted! 🎉',
+            'Thank you for contributing! Your field has been submitted for review and will be visible once approved.',
+            [{ text: 'OK' }]
+          );
+
+          // Show any upload warnings
+          if (result.errors && result.errors.length > 0) {
+            fieldLogger.warn('Some images failed to upload', { errors: result.errors });
+          }
+
+          fieldLogger.info('Field created successfully', { fieldId: result.field?.id });
+          return true;
+        } else {
+          const errorMessage = result.error || 'Failed to create field';
+          setErrors({ general: errorMessage });
+          Alert.alert('Submission Failed', errorMessage, [{ text: 'OK' }]);
+          return false;
+        }
+      } catch (error) {
+        const errorMessage =
+          error instanceof Error ? error.message : 'An unexpected error occurred';
+        setErrors({ general: errorMessage });
+        Alert.alert('Error', errorMessage, [{ text: 'OK' }]);
+        return false;
+      } finally {
+        setIsSubmitting(false);
+      }
+    },
+    [formData, images, validateForm]
+  );
 
   const resetForm = useCallback(() => {
     setFormData(DEFAULT_FORM_DATA);

@@ -1,7 +1,7 @@
 import React from 'react';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { MapScreen } from './src/screens/MapScreen';
 import { ErrorBoundary } from './src/components/ErrorBoundary';
+import { MapScreen } from './src/screens/MapScreen';
 
 /**
  * Root App component

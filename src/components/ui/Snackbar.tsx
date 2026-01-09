@@ -1,11 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import {
-  Animated,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import { Animated, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { colors, spacing, borderRadius, typography } from '@/constants';
 
 type SnackbarType = 'error' | 'success' | 'warning' | 'info';
@@ -63,6 +57,7 @@ export function Snackbar({
 
       return () => clearTimeout(timer);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [visible, duration]);
 
   const handleDismiss = () => {
@@ -112,57 +107,52 @@ export function Snackbar({
 }
 
 const styles = StyleSheet.create({
-  container: {
-    position: 'absolute',
-    bottom: 24,
-    left: spacing.md,
-    right: spacing.md,
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: spacing.sm,
-    paddingHorizontal: spacing.md,
-    borderRadius: borderRadius.md,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 6,
-    zIndex: 9999,
-  },
-  content: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  icon: {
-    fontSize: 16,
-    color: colors.background,
-    marginRight: spacing.sm,
-  },
-  message: {
-    flex: 1,
-    fontSize: typography.sizes.sm,
-    color: colors.background,
-    fontWeight: typography.weights.medium,
-  },
   actionButton: {
     marginLeft: spacing.sm,
     paddingHorizontal: spacing.sm,
     paddingVertical: spacing.xs,
   },
   actionLabel: {
-    fontSize: typography.sizes.sm,
     color: colors.background,
+    fontSize: typography.sizes.sm,
     fontWeight: typography.weights.bold,
     textTransform: 'uppercase',
+  },
+  container: {
+    alignItems: 'center',
+    borderRadius: borderRadius.md,
+    bottom: 24,
+    elevation: 6,
+    flexDirection: 'row',
+    left: spacing.md,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+    position: 'absolute',
+    right: spacing.md,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    zIndex: 9999,
+  },
+  content: {
+    alignItems: 'center',
+    flex: 1,
+    flexDirection: 'row',
   },
   dismissButton: {
     marginLeft: spacing.xs,
     padding: spacing.xs,
   },
   dismissIcon: {
-    fontSize: 14,
     color: colors.background,
+    fontSize: 14,
     opacity: 0.8,
+  },
+  message: {
+    color: colors.background,
+    flex: 1,
+    fontSize: typography.sizes.sm,
+    fontWeight: typography.weights.medium,
   },
 });

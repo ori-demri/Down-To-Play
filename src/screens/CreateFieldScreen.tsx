@@ -19,9 +19,9 @@ import {
   Snackbar,
 } from '@/components/ui';
 import { LocationPicker } from '@/components/ui/LocationPicker';
-import { useLocation } from '@/hooks';
-import { useCreateField } from '@/features/fields/hooks/useCreateField';
 import { colors, spacing, borderRadius, typography } from '@/constants';
+import { useCreateField } from '@/features/fields/hooks/useCreateField';
+import { useLocation } from '@/hooks';
 import { SurfaceType } from '@/types';
 
 interface CreateFieldScreenProps {
@@ -31,7 +31,7 @@ interface CreateFieldScreenProps {
 
 export function CreateFieldScreen({ onClose, onSuccess }: CreateFieldScreenProps) {
   const { coordinates: userLocation, isLoading: isLoadingLocation } = useLocation();
-  
+
   const {
     formData,
     images,
@@ -55,9 +55,12 @@ export function CreateFieldScreen({ onClose, onSuccess }: CreateFieldScreenProps
     }
   }, [submitForm, onSuccess, onClose]);
 
-  const handleSurfaceTypeChange = useCallback((value: SurfaceType) => {
-    updateFormData('surfaceType', value);
-  }, [updateFormData]);
+  const handleSurfaceTypeChange = useCallback(
+    (value: SurfaceType) => {
+      updateFormData('surfaceType', value);
+    },
+    [updateFormData]
+  );
 
   return (
     <SafeAreaView style={styles.container}>
@@ -84,8 +87,8 @@ export function CreateFieldScreen({ onClose, onSuccess }: CreateFieldScreenProps
           <View style={styles.intro}>
             <Text style={styles.introTitle}>Help grow the community! 🌱</Text>
             <Text style={styles.introText}>
-              Share a public football field and help others discover great places to play.
-              Your submission will be reviewed before being published.
+              Share a public football field and help others discover great places to play. Your
+              submission will be reviewed before being published.
             </Text>
           </View>
 
@@ -140,35 +143,35 @@ export function CreateFieldScreen({ onClose, onSuccess }: CreateFieldScreenProps
           {/* Amenities Section */}
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Amenities & Features</Text>
-            
+
             <Checkbox
               label="Free to use"
               icon="🆓"
               checked={formData.isFree}
               onToggle={(checked) => updateFormData('isFree', checked)}
             />
-            
+
             <Checkbox
               label="Has lights (for night games)"
               icon="💡"
               checked={formData.hasLights}
               onToggle={(checked) => updateFormData('hasLights', checked)}
             />
-            
+
             <Checkbox
               label="Has goals"
               icon="🥅"
               checked={formData.hasGoals}
               onToggle={(checked) => updateFormData('hasGoals', checked)}
             />
-            
+
             <Checkbox
               label="Has changing rooms"
               icon="🚿"
               checked={formData.hasChangingRooms}
               onToggle={(checked) => updateFormData('hasChangingRooms', checked)}
             />
-            
+
             <Checkbox
               label="Has parking nearby"
               icon="🅿️"
@@ -207,13 +210,9 @@ export function CreateFieldScreen({ onClose, onSuccess }: CreateFieldScreenProps
             {isSubmitting ? (
               <View style={styles.progressContainer}>
                 <ActivityIndicator size="small" color={colors.primary} />
-                <Text style={styles.progressText}>
-                  Uploading... {uploadProgress}%
-                </Text>
+                <Text style={styles.progressText}>Uploading... {uploadProgress}%</Text>
                 <View style={styles.progressBar}>
-                  <View
-                    style={[styles.progressFill, { width: `${uploadProgress}%` }]}
-                  />
+                  <View style={[styles.progressFill, { width: `${uploadProgress}%` }]} />
                 </View>
               </View>
             ) : (
@@ -228,9 +227,8 @@ export function CreateFieldScreen({ onClose, onSuccess }: CreateFieldScreenProps
 
           {/* Disclaimer */}
           <Text style={styles.disclaimer}>
-            By submitting, you confirm this is a public football field and the
-            information provided is accurate. Submissions are reviewed before
-            being published.
+            By submitting, you confirm this is a public football field and the information provided
+            is accurate. Submissions are reviewed before being published.
           </Text>
         </ScrollView>
       </KeyboardAvoidingView>
@@ -248,103 +246,103 @@ export function CreateFieldScreen({ onClose, onSuccess }: CreateFieldScreenProps
 }
 
 const styles = StyleSheet.create({
+  closeButton: {
+    alignItems: 'center',
+    backgroundColor: colors.surface,
+    borderRadius: 20,
+    height: 40,
+    justifyContent: 'center',
+    width: 40,
+  },
+  closeButtonText: {
+    color: colors.text.secondary,
+    fontSize: 18,
+  },
   container: {
-    flex: 1,
     backgroundColor: colors.background,
+    flex: 1,
+  },
+  disclaimer: {
+    color: colors.text.muted,
+    fontSize: typography.sizes.xs,
+    lineHeight: 16,
+    textAlign: 'center',
   },
   header: {
-    flexDirection: 'row',
     alignItems: 'center',
+    borderBottomColor: colors.border,
+    borderBottomWidth: 1,
+    flexDirection: 'row',
     justifyContent: 'space-between',
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.md,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border,
-  },
-  closeButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: colors.surface,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  closeButtonText: {
-    fontSize: 18,
-    color: colors.text.secondary,
-  },
-  headerTitle: {
-    fontSize: typography.sizes.lg,
-    fontWeight: typography.weights.semibold,
-    color: colors.text.primary,
   },
   headerRight: {
     width: 40,
   },
+  headerTitle: {
+    color: colors.text.primary,
+    fontSize: typography.sizes.lg,
+    fontWeight: typography.weights.semibold,
+  },
+  intro: {
+    backgroundColor: colors.primaryLight + '15',
+    borderRadius: borderRadius.lg,
+    marginBottom: spacing.lg,
+    padding: spacing.md,
+  },
+  introText: {
+    color: colors.text.secondary,
+    fontSize: typography.sizes.sm,
+    lineHeight: 20,
+  },
+  introTitle: {
+    color: colors.primary,
+    fontSize: typography.sizes.lg,
+    fontWeight: typography.weights.semibold,
+    marginBottom: spacing.xs,
+  },
   keyboardView: {
     flex: 1,
   },
-  scrollView: {
-    flex: 1,
+  progressBar: {
+    backgroundColor: colors.surface,
+    borderRadius: 2,
+    height: 4,
+    overflow: 'hidden',
+    width: '100%',
+  },
+  progressContainer: {
+    alignItems: 'center',
+  },
+  progressFill: {
+    backgroundColor: colors.primary,
+    height: '100%',
+  },
+  progressText: {
+    color: colors.text.secondary,
+    fontSize: typography.sizes.sm,
+    marginBottom: spacing.sm,
+    marginTop: spacing.sm,
   },
   scrollContent: {
     padding: spacing.lg,
     paddingBottom: spacing.xxl,
   },
-  intro: {
-    backgroundColor: colors.primaryLight + '15',
-    padding: spacing.md,
-    borderRadius: borderRadius.lg,
-    marginBottom: spacing.lg,
-  },
-  introTitle: {
-    fontSize: typography.sizes.lg,
-    fontWeight: typography.weights.semibold,
-    color: colors.primary,
-    marginBottom: spacing.xs,
-  },
-  introText: {
-    fontSize: typography.sizes.sm,
-    color: colors.text.secondary,
-    lineHeight: 20,
+  scrollView: {
+    flex: 1,
   },
   section: {
     marginBottom: spacing.md,
   },
   sectionTitle: {
+    color: colors.text.primary,
     fontSize: typography.sizes.md,
     fontWeight: typography.weights.semibold,
-    color: colors.text.primary,
     marginBottom: spacing.sm,
   },
   submitContainer: {
-    marginTop: spacing.lg,
     marginBottom: spacing.md,
-  },
-  progressContainer: {
-    alignItems: 'center',
-  },
-  progressText: {
-    fontSize: typography.sizes.sm,
-    color: colors.text.secondary,
-    marginTop: spacing.sm,
-    marginBottom: spacing.sm,
-  },
-  progressBar: {
-    width: '100%',
-    height: 4,
-    backgroundColor: colors.surface,
-    borderRadius: 2,
-    overflow: 'hidden',
-  },
-  progressFill: {
-    height: '100%',
-    backgroundColor: colors.primary,
-  },
-  disclaimer: {
-    fontSize: typography.sizes.xs,
-    color: colors.text.muted,
-    textAlign: 'center',
-    lineHeight: 16,
+    marginTop: spacing.lg,
   },
 });

@@ -1,8 +1,8 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
-import { SurfaceType } from '@/types';
-import { SURFACE_TYPE_LABELS, SURFACE_TYPE_ICONS } from '@/features/fields/types';
 import { colors, spacing, borderRadius, typography } from '@/constants';
+import { SURFACE_TYPE_LABELS, SURFACE_TYPE_ICONS } from '@/features/fields/types';
+import { SurfaceType } from '@/types';
 
 interface SurfaceTypePickerProps {
   value: SurfaceType;
@@ -59,47 +59,47 @@ const styles = StyleSheet.create({
   container: {
     marginBottom: spacing.md,
   },
+  error: {
+    color: colors.error,
+    fontSize: typography.sizes.sm,
+    marginTop: spacing.xs,
+  },
   label: {
+    color: colors.text.primary,
     fontSize: typography.sizes.sm,
     fontWeight: typography.weights.medium,
-    color: colors.text.primary,
     marginBottom: spacing.sm,
-  },
-  scrollContent: {
-    paddingRight: spacing.md,
   },
   option: {
     alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: spacing.md,
-    paddingHorizontal: spacing.md,
-    marginRight: spacing.sm,
-    borderRadius: borderRadius.lg,
     backgroundColor: colors.surface,
-    borderWidth: 2,
     borderColor: 'transparent',
+    borderRadius: borderRadius.lg,
+    borderWidth: 2,
+    justifyContent: 'center',
+    marginRight: spacing.sm,
     minWidth: 90,
-  },
-  optionSelected: {
-    backgroundColor: colors.primaryLight + '20',
-    borderColor: colors.primary,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.md,
   },
   optionIcon: {
     fontSize: 28,
     marginBottom: spacing.xs,
   },
   optionLabel: {
-    fontSize: typography.sizes.xs,
     color: colors.text.secondary,
+    fontSize: typography.sizes.xs,
     textAlign: 'center',
   },
   optionLabelSelected: {
     color: colors.primary,
     fontWeight: typography.weights.semibold,
   },
-  error: {
-    fontSize: typography.sizes.sm,
-    color: colors.error,
-    marginTop: spacing.xs,
+  optionSelected: {
+    backgroundColor: colors.primaryLight + '20',
+    borderColor: colors.primary,
+  },
+  scrollContent: {
+    paddingRight: spacing.md,
   },
 });

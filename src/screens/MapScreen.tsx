@@ -4,16 +4,16 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { MapView } from '@/components/map';
 import { FieldDetailsSheet } from '@/components/ui/FieldDetailsSheet';
 import { FloatingActionButton } from '@/components/ui/FloatingActionButton';
-import { CreateFieldScreen } from './CreateFieldScreen';
-import { useLocation } from '@/hooks';
-import { useFields } from '@/features/fields/hooks/useFields';
-import { Field } from '@/types';
 import { colors } from '@/constants';
+import { useFields } from '@/features/fields/hooks/useFields';
+import { useLocation } from '@/hooks';
+import { Field } from '@/types';
+import { CreateFieldScreen } from './CreateFieldScreen';
 
 export function MapScreen() {
   const { coordinates, isLoading: isLoadingLocation } = useLocation();
   const { fields, isLoading: isLoadingFields, refetch: refetchFields } = useFields(coordinates);
-  
+
   const [selectedField, setSelectedField] = useState<Field | null>(null);
   const [isCreateFieldVisible, setIsCreateFieldVisible] = useState(false);
 
@@ -25,7 +25,7 @@ export function MapScreen() {
     setSelectedField(null);
   }, []);
 
-  const handleCreateGame = useCallback((field: Field) => {
+  const handleCreateGame = useCallback((_field: Field) => {
     // TODO: Navigate to create game screen - feature to be implemented
   }, []);
 
@@ -46,7 +46,7 @@ export function MapScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="dark-content" backgroundColor={colors.background} />
-      
+
       <View style={styles.mapContainer}>
         <MapView
           fields={fields}
@@ -64,11 +64,7 @@ export function MapScreen() {
         </TouchableOpacity>
 
         {/* Floating Action Button to add new field */}
-        <FloatingActionButton
-          icon="⚽"
-          label="Add Field"
-          onPress={handleOpenCreateField}
-        />
+        <FloatingActionButton icon="⚽" label="Add Field" onPress={handleOpenCreateField} />
       </View>
 
       {/* Field details bottom sheet */}
@@ -85,10 +81,7 @@ export function MapScreen() {
         presentationStyle="pageSheet"
         onRequestClose={handleCloseCreateField}
       >
-        <CreateFieldScreen
-          onClose={handleCloseCreateField}
-          onSuccess={handleFieldCreated}
-        />
+        <CreateFieldScreen onClose={handleCloseCreateField} onSuccess={handleFieldCreated} />
       </Modal>
     </SafeAreaView>
   );
@@ -96,32 +89,32 @@ export function MapScreen() {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     backgroundColor: colors.background,
+    flex: 1,
   },
   mapContainer: {
     flex: 1,
   },
   menuButton: {
-    position: 'absolute',
-    top: 16,
+    elevation: 3,
     left: 16,
+    position: 'absolute',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.15,
     shadowRadius: 4,
-    elevation: 3,
-  },
-  menuIconContainer: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: colors.background,
-    alignItems: 'center',
-    justifyContent: 'center',
+    top: 16,
   },
   menuIcon: {
-    fontSize: 20,
     color: colors.text.primary,
+    fontSize: 20,
+  },
+  menuIconContainer: {
+    alignItems: 'center',
+    backgroundColor: colors.background,
+    borderRadius: 20,
+    height: 40,
+    justifyContent: 'center',
+    width: 40,
   },
 });

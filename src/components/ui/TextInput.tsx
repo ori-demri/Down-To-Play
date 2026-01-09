@@ -66,44 +66,44 @@ const styles = StyleSheet.create({
   container: {
     marginBottom: spacing.md,
   },
-  label: {
-    fontSize: typography.sizes.sm,
-    fontWeight: typography.weights.medium,
-    color: colors.text.primary,
-    marginBottom: spacing.xs,
-  },
-  required: {
+  error: {
     color: colors.error,
+    fontSize: typography.sizes.sm,
+    marginTop: spacing.xs,
+  },
+  hint: {
+    color: colors.text.muted,
+    fontSize: typography.sizes.sm,
+    marginTop: spacing.xs,
   },
   input: {
     backgroundColor: colors.surface,
-    borderWidth: 1,
     borderColor: colors.border,
     borderRadius: borderRadius.md,
+    borderWidth: 1,
+    color: colors.text.primary,
+    fontSize: typography.sizes.md,
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.md,
-    fontSize: typography.sizes.md,
-    color: colors.text.primary,
-  },
-  inputFocused: {
-    borderColor: colors.primary,
-    backgroundColor: colors.background,
   },
   inputError: {
     borderColor: colors.error,
+  },
+  inputFocused: {
+    backgroundColor: colors.background,
+    borderColor: colors.primary,
   },
   inputMultiline: {
     minHeight: 100,
     textAlignVertical: 'top',
   },
-  error: {
+  label: {
+    color: colors.text.primary,
     fontSize: typography.sizes.sm,
-    color: colors.error,
-    marginTop: spacing.xs,
+    fontWeight: typography.weights.medium,
+    marginBottom: spacing.xs,
   },
-  hint: {
-    fontSize: typography.sizes.sm,
-    color: colors.text.muted,
-    marginTop: spacing.xs,
+  required: {
+    color: colors.error,
   },
 });

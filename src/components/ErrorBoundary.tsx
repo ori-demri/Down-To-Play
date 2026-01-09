@@ -21,9 +21,11 @@ interface State {
 function isExpoUpdatesError(error: Error | null): boolean {
   if (!error) return false;
   const message = error.message || '';
-  return message.includes('Failed to download remote update') ||
-         message.includes('java.io.IOException') ||
-         message.includes('IOException');
+  return (
+    message.includes('Failed to download remote update') ||
+    message.includes('java.io.IOException') ||
+    message.includes('IOException')
+  );
 }
 
 /**
@@ -90,7 +92,7 @@ export class ErrorBoundary extends Component<Props, State> {
             <Text style={styles.emoji}>😕</Text>
             <Text style={styles.title}>Something went wrong</Text>
             <Text style={styles.message}>
-              We're sorry, but something unexpected happened. Please try again.
+              We&apos;re sorry, but something unexpected happened. Please try again.
             </Text>
             {__DEV__ && this.state.error && (
               <View style={styles.errorDetails}>
@@ -111,11 +113,22 @@ export class ErrorBoundary extends Component<Props, State> {
 }
 
 const styles = StyleSheet.create({
+  button: {
+    backgroundColor: colors.primary,
+    borderRadius: borderRadius.md,
+    paddingHorizontal: spacing.xl,
+    paddingVertical: spacing.md,
+  },
+  buttonText: {
+    color: colors.text.inverse,
+    fontSize: typography.sizes.md,
+    fontWeight: typography.weights.semibold,
+  },
   container: {
-    flex: 1,
-    backgroundColor: colors.background,
-    justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: colors.background,
+    flex: 1,
+    justifyContent: 'center',
     padding: spacing.lg,
   },
   content: {
@@ -126,47 +139,36 @@ const styles = StyleSheet.create({
     fontSize: 64,
     marginBottom: spacing.md,
   },
-  title: {
-    fontSize: typography.sizes.xl,
-    fontWeight: typography.weights.bold,
-    color: colors.text.primary,
-    marginBottom: spacing.sm,
-    textAlign: 'center',
-  },
-  message: {
-    fontSize: typography.sizes.md,
-    color: colors.text.secondary,
-    textAlign: 'center',
-    marginBottom: spacing.lg,
-    lineHeight: 22,
-  },
   errorDetails: {
     backgroundColor: colors.error + '15',
-    padding: spacing.md,
     borderRadius: borderRadius.md,
     marginBottom: spacing.lg,
+    padding: spacing.md,
     width: '100%',
   },
-  errorTitle: {
-    fontSize: typography.sizes.sm,
-    fontWeight: typography.weights.semibold,
-    color: colors.error,
-    marginBottom: spacing.xs,
-  },
   errorText: {
-    fontSize: typography.sizes.xs,
     color: colors.error,
     fontFamily: 'monospace',
+    fontSize: typography.sizes.xs,
   },
-  button: {
-    backgroundColor: colors.primary,
-    paddingVertical: spacing.md,
-    paddingHorizontal: spacing.xl,
-    borderRadius: borderRadius.md,
-  },
-  buttonText: {
-    color: colors.text.inverse,
-    fontSize: typography.sizes.md,
+  errorTitle: {
+    color: colors.error,
+    fontSize: typography.sizes.sm,
     fontWeight: typography.weights.semibold,
+    marginBottom: spacing.xs,
+  },
+  message: {
+    color: colors.text.secondary,
+    fontSize: typography.sizes.md,
+    lineHeight: 22,
+    marginBottom: spacing.lg,
+    textAlign: 'center',
+  },
+  title: {
+    color: colors.text.primary,
+    fontSize: typography.sizes.xl,
+    fontWeight: typography.weights.bold,
+    marginBottom: spacing.sm,
+    textAlign: 'center',
   },
 });

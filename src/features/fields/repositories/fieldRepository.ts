@@ -1,8 +1,8 @@
 import { supabase } from '@/infrastructure/supabase';
 import { Field, Coordinates, SurfaceType, FieldStatus } from '@/types';
-import { CreateFieldFormData, SelectedImage } from '../types';
-import { imageService } from '../services/imageService';
 import { fieldLogger } from '@/utils/logger';
+import { imageService } from '../services/imageService';
+import { CreateFieldFormData, SelectedImage } from '../types';
 
 // Database row types
 interface FieldRow {
@@ -49,10 +49,10 @@ class FieldRepository {
     try {
       // Step 1: Create the field record
       onProgress?.(5);
-      
+
       // Anonymous uploads are active immediately (for dev), authenticated users go through moderation
       const status = userId ? 'pending' : 'active';
-      
+
       const fieldData = {
         name: formData.name.trim(),
         description: formData.description.trim() || null,
@@ -65,7 +65,8 @@ class FieldRepository {
         has_changing_rooms: formData.hasChangingRooms,
         has_parking: formData.hasParking,
         // player_capacity must be > 0 or null (DB constraint)
-        player_capacity: formData.playerCapacity && formData.playerCapacity > 0 ? formData.playerCapacity : null,
+        player_capacity:
+          formData.playerCapacity && formData.playerCapacity > 0 ? formData.playerCapacity : null,
         notes: formData.notes.trim() || null,
         status: status as 'pending' | 'active',
         created_by: userId,
@@ -119,9 +120,7 @@ class FieldRepository {
           uploaded_by: userId,
         }));
 
-        const { error: imagesError } = await supabase
-          .from('field_images')
-          .insert(imageRecords);
+        const { error: imagesError } = await supabase.from('field_images').insert(imageRecords);
 
         if (imagesError) {
           fieldLogger.error('Error saving image records', { error: imagesError.message });
@@ -141,8 +140,8 @@ class FieldRepository {
         errors: imageErrors.length > 0 ? imageErrors : undefined,
       };
     } catch (error) {
-      fieldLogger.error('Error in createField', { 
-        error: error instanceof Error ? error.message : String(error) 
+      fieldLogger.error('Error in createField', {
+        error: error instanceof Error ? error.message : String(error),
       });
       return {
         success: false,
@@ -169,10 +168,10 @@ class FieldRepository {
 
       const rows = (data || []) as unknown as FieldRow[];
       fieldLogger.debug('Fetched fields', { count: rows.length });
-      return rows.map(row => this.mapRowToField(row));
+      return rows.map((row) => this.mapRowToField(row));
     } catch (error) {
-      fieldLogger.error('Error in getAllFields', { 
-        error: error instanceof Error ? error.message : String(error) 
+      fieldLogger.error('Error in getAllFields', {
+        error: error instanceof Error ? error.message : String(error),
       });
       return [];
     }
@@ -187,10 +186,7 @@ class FieldRepository {
   ): Promise<Field[]> {
     try {
       // Using a raw query approach since RPC typing can be complex
-      const { data, error } = await supabase
-        .from('fields')
-        .select('*')
-        .eq('status', 'active');
+      const { data, error } = await supabase.from('fields').select('*').eq('status', 'active');
 
       if (error) {
         fieldLogger.error('Error fetching nearby fields', { error: error.message });
@@ -199,19 +195,19 @@ class FieldRepository {
 
       // Filter by distance client-side (for now - in production use PostGIS)
       const rows = (data || []) as unknown as FieldRow[];
-      const filtered = rows.filter(row => {
-        const distance = this.calculateDistance(
-          coordinates,
-          { latitude: row.latitude, longitude: row.longitude }
-        );
+      const filtered = rows.filter((row) => {
+        const distance = this.calculateDistance(coordinates, {
+          latitude: row.latitude,
+          longitude: row.longitude,
+        });
         return distance <= radiusMeters;
       });
-      
+
       fieldLogger.debug('Fetched nearby fields', { total: rows.length, filtered: filtered.length });
-      return filtered.map(row => this.mapRowToField(row));
+      return filtered.map((row) => this.mapRowToField(row));
     } catch (error) {
-      fieldLogger.error('Error in getFieldsNearLocation', { 
-        error: error instanceof Error ? error.message : String(error) 
+      fieldLogger.error('Error in getFieldsNearLocation', {
+        error: error instanceof Error ? error.message : String(error),
       });
       return [];
     }
@@ -240,11 +236,7 @@ class FieldRepository {
    */
   async getFieldById(id: string): Promise<Field | null> {
     try {
-      const { data, error } = await supabase
-        .from('fields')
-        .select('*')
-        .eq('id', id)
-        .single();
+      const { data, error } = await supabase.from('fields').select('*').eq('id', id).single();
 
       if (error || !data) {
         return null;
@@ -252,8 +244,8 @@ class FieldRepository {
 
       return this.mapRowToField(data as unknown as FieldRow);
     } catch (error) {
-      fieldLogger.error('Error in getFieldById', { 
-        error: error instanceof Error ? error.message : String(error) 
+      fieldLogger.error('Error in getFieldById', {
+        error: error instanceof Error ? error.message : String(error),
       });
       return null;
     }
@@ -277,8 +269,8 @@ class FieldRepository {
 
       return (data || []).map((row: { image_url: string }) => row.image_url);
     } catch (error) {
-      fieldLogger.error('Error in getFieldImages', { 
-        error: error instanceof Error ? error.message : String(error) 
+      fieldLogger.error('Error in getFieldImages', {
+        error: error instanceof Error ? error.message : String(error),
       });
       return [];
     }

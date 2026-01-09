@@ -1,10 +1,5 @@
 import React from 'react';
-import {
-  TouchableOpacity,
-  Text,
-  StyleSheet,
-  ViewStyle,
-} from 'react-native';
+import { TouchableOpacity, Text, StyleSheet, ViewStyle } from 'react-native';
 import { colors, spacing } from '@/constants';
 
 interface FloatingActionButtonProps {
@@ -41,38 +36,38 @@ export function FloatingActionButton({
 }
 
 const styles = StyleSheet.create({
+  circular: {
+    borderRadius: 28,
+    bottom: spacing.xl + 60,
+    height: 56,
+    right: spacing.md,
+    width: 56, // Above the center button
+  },
   container: {
-    position: 'absolute',
-    backgroundColor: colors.primary,
-    flexDirection: 'row',
     alignItems: 'center',
+    backgroundColor: colors.primary,
+    elevation: 8,
+    flexDirection: 'row',
     justifyContent: 'center',
+    position: 'absolute',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 6,
-    elevation: 8,
-  },
-  circular: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    right: spacing.md,
-    bottom: spacing.xl + 60, // Above the center button
-  },
-  extended: {
-    paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.md,
-    borderRadius: 28,
-    right: spacing.md,
-    bottom: spacing.xl + 60,
   },
   disabled: {
     opacity: 0.5,
   },
+  extended: {
+    borderRadius: 28,
+    bottom: spacing.xl + 60,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.md,
+    right: spacing.md,
+  },
   icon: {
-    fontSize: 24,
     color: colors.text.inverse,
+    fontSize: 24,
   },
   label: {
     color: colors.text.inverse,

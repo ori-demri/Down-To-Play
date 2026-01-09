@@ -1,16 +1,8 @@
 import React from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  Image,
-  ScrollView,
-  Alert,
-} from 'react-native';
-import { SelectedImage } from '@/features/fields/types';
-import { imageService } from '@/features/fields';
+import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView, Alert } from 'react-native';
 import { colors, spacing, borderRadius, typography } from '@/constants';
+import { imageService } from '@/features/fields';
+import { SelectedImage } from '@/features/fields/types';
 
 interface ImagePickerProps {
   images: SelectedImage[];
@@ -28,24 +20,20 @@ export function ImagePickerComponent({
   const canAddMore = images.length < maxImages;
 
   const handleAddImage = () => {
-    Alert.alert(
-      'Add Photo',
-      'Choose how you want to add a photo of the field',
-      [
-        {
-          text: 'Take Photo',
-          onPress: handleTakePhoto,
-        },
-        {
-          text: 'Choose from Gallery',
-          onPress: handlePickFromGallery,
-        },
-        {
-          text: 'Cancel',
-          style: 'cancel',
-        },
-      ]
-    );
+    Alert.alert('Add Photo', 'Choose how you want to add a photo of the field', [
+      {
+        text: 'Take Photo',
+        onPress: handleTakePhoto,
+      },
+      {
+        text: 'Choose from Gallery',
+        onPress: handlePickFromGallery,
+      },
+      {
+        text: 'Cancel',
+        style: 'cancel',
+      },
+    ]);
   };
 
   const handleTakePhoto = async () => {
@@ -67,25 +55,21 @@ export function ImagePickerComponent({
   };
 
   const handleRemoveImage = (index: number) => {
-    Alert.alert(
-      'Remove Photo',
-      'Are you sure you want to remove this photo?',
-      [
-        {
-          text: 'Cancel',
-          style: 'cancel',
+    Alert.alert('Remove Photo', 'Are you sure you want to remove this photo?', [
+      {
+        text: 'Cancel',
+        style: 'cancel',
+      },
+      {
+        text: 'Remove',
+        style: 'destructive',
+        onPress: () => {
+          const newImages = [...images];
+          newImages.splice(index, 1);
+          onImagesChange(newImages);
         },
-        {
-          text: 'Remove',
-          style: 'destructive',
-          onPress: () => {
-            const newImages = [...images];
-            newImages.splice(index, 1);
-            onImagesChange(newImages);
-          },
-        },
-      ]
-    );
+      },
+    ]);
   };
 
   return (
@@ -96,7 +80,7 @@ export function ImagePickerComponent({
           {images.length}/{maxImages}
         </Text>
       </View>
-      
+
       <Text style={styles.hint}>
         Add at least one photo of the field. The first photo will be the main image.
       </Text>
@@ -115,10 +99,7 @@ export function ImagePickerComponent({
                 <Text style={styles.primaryBadgeText}>Main</Text>
               </View>
             )}
-            <TouchableOpacity
-              style={styles.removeButton}
-              onPress={() => handleRemoveImage(index)}
-            >
+            <TouchableOpacity style={styles.removeButton} onPress={() => handleRemoveImage(index)}>
               <Text style={styles.removeButtonText}>✕</Text>
             </TouchableOpacity>
           </View>
@@ -141,51 +122,72 @@ export function ImagePickerComponent({
 const IMAGE_SIZE = 120;
 
 const styles = StyleSheet.create({
+  addButton: {
+    alignItems: 'center',
+    backgroundColor: colors.surface,
+    borderColor: colors.border,
+    borderRadius: borderRadius.md,
+    borderStyle: 'dashed',
+    borderWidth: 2,
+    height: IMAGE_SIZE,
+    justifyContent: 'center',
+    width: IMAGE_SIZE,
+  },
+  addButtonIcon: {
+    fontSize: 32,
+    marginBottom: spacing.xs,
+  },
+  addButtonText: {
+    color: colors.text.secondary,
+    fontSize: typography.sizes.sm,
+  },
   container: {
     marginBottom: spacing.md,
   },
+  counter: {
+    color: colors.text.muted,
+    fontSize: typography.sizes.sm,
+  },
+  error: {
+    color: colors.error,
+    fontSize: typography.sizes.sm,
+    marginTop: spacing.sm,
+  },
   header: {
+    alignItems: 'center',
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
     marginBottom: spacing.xs,
   },
-  label: {
-    fontSize: typography.sizes.sm,
-    fontWeight: typography.weights.medium,
-    color: colors.text.primary,
-  },
-  counter: {
-    fontSize: typography.sizes.sm,
-    color: colors.text.muted,
-  },
   hint: {
-    fontSize: typography.sizes.sm,
     color: colors.text.muted,
+    fontSize: typography.sizes.sm,
     marginBottom: spacing.md,
   },
-  scrollContent: {
-    paddingRight: spacing.md,
+  image: {
+    height: '100%',
+    width: '100%',
   },
   imageContainer: {
-    width: IMAGE_SIZE,
+    borderRadius: borderRadius.md,
     height: IMAGE_SIZE,
     marginRight: spacing.sm,
-    borderRadius: borderRadius.md,
     overflow: 'hidden',
+    width: IMAGE_SIZE,
   },
-  image: {
-    width: '100%',
-    height: '100%',
+  label: {
+    color: colors.text.primary,
+    fontSize: typography.sizes.sm,
+    fontWeight: typography.weights.medium,
   },
   primaryBadge: {
-    position: 'absolute',
-    top: spacing.xs,
-    left: spacing.xs,
     backgroundColor: colors.primary,
+    borderRadius: borderRadius.sm,
+    left: spacing.xs,
     paddingHorizontal: spacing.sm,
     paddingVertical: 2,
-    borderRadius: borderRadius.sm,
+    position: 'absolute',
+    top: spacing.xs,
   },
   primaryBadgeText: {
     color: colors.text.inverse,
@@ -193,43 +195,22 @@ const styles = StyleSheet.create({
     fontWeight: typography.weights.bold,
   },
   removeButton: {
-    position: 'absolute',
-    top: spacing.xs,
-    right: spacing.xs,
-    width: 24,
-    height: 24,
-    borderRadius: 12,
-    backgroundColor: colors.error,
     alignItems: 'center',
+    backgroundColor: colors.error,
+    borderRadius: 12,
+    height: 24,
     justifyContent: 'center',
+    position: 'absolute',
+    right: spacing.xs,
+    top: spacing.xs,
+    width: 24,
   },
   removeButtonText: {
     color: colors.text.inverse,
     fontSize: 12,
     fontWeight: typography.weights.bold,
   },
-  addButton: {
-    width: IMAGE_SIZE,
-    height: IMAGE_SIZE,
-    borderRadius: borderRadius.md,
-    borderWidth: 2,
-    borderColor: colors.border,
-    borderStyle: 'dashed',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: colors.surface,
-  },
-  addButtonIcon: {
-    fontSize: 32,
-    marginBottom: spacing.xs,
-  },
-  addButtonText: {
-    fontSize: typography.sizes.sm,
-    color: colors.text.secondary,
-  },
-  error: {
-    fontSize: typography.sizes.sm,
-    color: colors.error,
-    marginTop: spacing.sm,
+  scrollContent: {
+    paddingRight: spacing.md,
   },
 });

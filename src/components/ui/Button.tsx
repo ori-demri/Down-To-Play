@@ -74,63 +74,63 @@ export const Button = memo(function Button({
 
 const styles = StyleSheet.create({
   base: {
-    flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
     borderRadius: borderRadius.md,
-  },
-  primary: {
-    backgroundColor: colors.primary,
-  },
-  secondary: {
-    backgroundColor: colors.surface,
-  },
-  outline: {
-    backgroundColor: 'transparent',
-    borderWidth: 1.5,
-    borderColor: colors.primary,
-  },
-  ghost: {
-    backgroundColor: 'transparent',
-  },
-  smallSize: {
-    paddingVertical: spacing.sm,
-    paddingHorizontal: spacing.md,
-  },
-  mediumSize: {
-    paddingVertical: spacing.md,
-    paddingHorizontal: spacing.lg,
-  },
-  largeSize: {
-    paddingVertical: spacing.md + 2,
-    paddingHorizontal: spacing.xl,
+    flexDirection: 'row',
+    justifyContent: 'center',
   },
   disabled: {
     opacity: 0.5,
   },
-  text: {
-    fontWeight: typography.weights.semibold,
-  },
-  primaryText: {
-    color: colors.text.inverse,
-  },
-  secondaryText: {
-    color: colors.text.primary,
-  },
-  outlineText: {
-    color: colors.primary,
+  ghost: {
+    backgroundColor: 'transparent',
   },
   ghostText: {
     color: colors.primary,
   },
-  smallText: {
-    fontSize: typography.sizes.sm,
+  largeSize: {
+    paddingHorizontal: spacing.xl,
+    paddingVertical: spacing.md + 2,
+  },
+  largeText: {
+    fontSize: typography.sizes.lg,
+  },
+  mediumSize: {
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.md,
   },
   mediumText: {
     fontSize: typography.sizes.md,
   },
-  largeText: {
-    fontSize: typography.sizes.lg,
+  outline: {
+    backgroundColor: 'transparent',
+    borderColor: colors.primary,
+    borderWidth: 1.5,
+  },
+  outlineText: {
+    color: colors.primary,
+  },
+  primary: {
+    backgroundColor: colors.primary,
+  },
+  primaryText: {
+    color: colors.text.inverse,
+  },
+  secondary: {
+    backgroundColor: colors.surface,
+  },
+  secondaryText: {
+    color: colors.text.primary,
+  },
+  smallSize: {
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+  },
+  smallText: {
+    fontSize: typography.sizes.sm,
+  },
+  text: {
+    fontWeight: typography.weights.semibold,
   },
   textWithIcon: {
     marginLeft: spacing.sm,

@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Field, Coordinates } from '@/types';
-import { fieldRepository } from '../repositories/fieldRepository';
 import { fieldLogger } from '@/utils/logger';
+import { fieldRepository } from '../repositories/fieldRepository';
 
 interface UseFieldsReturn {
   fields: Field[];
@@ -12,7 +12,7 @@ interface UseFieldsReturn {
 
 export function useFields(
   userLocation: Coordinates | null,
-  radiusMeters: number = 50000 // 50km default for development
+  _radiusMeters: number = 50000 // 50km default for development - reserved for future location-based queries
 ): UseFieldsReturn {
   const [fields, setFields] = useState<Field[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -28,8 +28,8 @@ export function useFields(
       setFields(fetchedFields);
       fieldLogger.debug('Fields fetched successfully', { count: fetchedFields.length });
     } catch (err) {
-      fieldLogger.error('Error fetching fields', { 
-        error: err instanceof Error ? err.message : String(err) 
+      fieldLogger.error('Error fetching fields', {
+        error: err instanceof Error ? err.message : String(err),
       });
       setError(err instanceof Error ? err.message : 'Failed to fetch fields');
     } finally {
