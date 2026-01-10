@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
+import { fieldRepository } from '@/features/fields/repositories/fieldRepository';
 import { Field, Coordinates } from '@/types';
 import { fieldLogger } from '@/utils/logger';
-import { fieldRepository } from '../repositories/fieldRepository';
 
 interface UseFieldsReturn {
   fields: Field[];

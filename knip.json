@@ -4,5 +4,11 @@
   "project": ["src/**/*.{ts,tsx}"],
   "ignore": ["babel.config.js"],
   "ignoreDependencies": ["babel-plugin-module-resolver", "babel-preset-expo"],
-  "ignoreBinaries": ["expo-doctor"]
+  "ignoreBinaries": ["expo-doctor"],
+  "ignoreExportsUsedInFile": true,
+  "ignoreWorkspaces": [],
+  "rules": {
+    "exports": "off",
+    "types": "off"
+  }
 }

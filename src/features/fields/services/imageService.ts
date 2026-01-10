@@ -1,9 +1,9 @@
 import { decode } from 'base64-arraybuffer';
 import * as FileSystem from 'expo-file-system/legacy';
 import * as ImagePicker from 'expo-image-picker';
+import { SelectedImage } from '@/features/fields/types';
 import { supabase, STORAGE_BUCKETS } from '@/infrastructure/supabase';
 import { storageLogger } from '@/utils/logger';
-import { SelectedImage } from '../types';
 
 // Maximum image size in bytes (5MB) - TODO: implement size validation
 // eslint-disable-next-line @typescript-eslint/no-unused-vars

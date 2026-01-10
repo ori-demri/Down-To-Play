@@ -1,8 +1,8 @@
+import { imageService } from '@/features/fields/services/imageService';
+import { CreateFieldFormData, SelectedImage } from '@/features/fields/types';
 import { supabase } from '@/infrastructure/supabase';
 import { Field, Coordinates, SurfaceType, FieldStatus } from '@/types';
 import { fieldLogger } from '@/utils/logger';
-import { imageService } from '../services/imageService';
-import { CreateFieldFormData, SelectedImage } from '../types';
 
 // Database row types
 interface FieldRow {

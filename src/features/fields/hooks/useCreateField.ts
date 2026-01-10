@@ -1,14 +1,14 @@
 import { useState, useCallback } from 'react';
 import { Alert } from 'react-native';
-import { Coordinates } from '@/types';
-import { fieldLogger } from '@/utils/logger';
-import { fieldRepository } from '../repositories/fieldRepository';
+import { fieldRepository } from '@/features/fields/repositories/fieldRepository';
 import {
   CreateFieldFormData,
   CreateFieldFormErrors,
   SelectedImage,
   DEFAULT_FORM_DATA,
-} from '../types';
+} from '@/features/fields/types';
+import { Coordinates } from '@/types';
+import { fieldLogger } from '@/utils/logger';
 
 interface UseCreateFieldReturn {
   formData: CreateFieldFormData;

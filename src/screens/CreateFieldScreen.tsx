@@ -20,6 +20,7 @@ import {
 } from '@/components/ui';
 import { LocationPicker } from '@/components/ui/LocationPicker';
 import { colors, spacing, borderRadius, typography } from '@/constants';
+import { useAuth } from '@/features/auth';
 import { useCreateField } from '@/features/fields/hooks/useCreateField';
 import { useLocation } from '@/hooks';
 import { SurfaceType } from '@/types';
@@ -31,6 +32,7 @@ interface CreateFieldScreenProps {
 
 export function CreateFieldScreen({ onClose, onSuccess }: CreateFieldScreenProps) {
   const { coordinates: userLocation, isLoading: isLoadingLocation } = useLocation();
+  const { user } = useAuth();
 
   const {
     formData,
@@ -47,13 +49,13 @@ export function CreateFieldScreen({ onClose, onSuccess }: CreateFieldScreenProps
   } = useCreateField();
 
   const handleSubmit = useCallback(async () => {
-    // Submit without user ID (anonymous submission)
-    const success = await submitForm(null);
+    // Submit with authenticated user ID
+    const success = await submitForm(user?.id || null);
     if (success) {
       onSuccess?.();
       onClose();
     }
-  }, [submitForm, onSuccess, onClose]);
+  }, [submitForm, user?.id, onSuccess, onClose]);
 
   const handleSurfaceTypeChange = useCallback(
     (value: SurfaceType) => {

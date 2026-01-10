@@ -114,6 +114,20 @@ module.exports = {
     'import/no-duplicates': 'error',
     'import/no-unresolved': 'off', // TypeScript handles this
 
+    // Enforce @ alias for local imports (no relative parent imports in src/)
+    // Note: Sibling imports (./) are allowed for index.ts barrel files
+    'no-restricted-imports': [
+      'error',
+      {
+        patterns: [
+          {
+            group: ['../*'],
+            message: 'Use @/ alias instead of relative parent imports (e.g., @/components instead of ../components)',
+          },
+        ],
+      },
+    ],
+
     // General
     'no-console': ['warn', { allow: ['warn', 'error'] }],
     'prefer-const': 'error',

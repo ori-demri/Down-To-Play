@@ -19,9 +19,7 @@
       "infoPlist": {
         "CFBundleURLTypes": [
           {
-            "CFBundleURLSchemes": [
-              "downtoplay"
-            ]
+            "CFBundleURLSchemes": ["downtoplay"]
           }
         ],
         "NSLocationWhenInUseUsageDescription": "This app needs access to your location to show nearby football fields.",
@@ -29,9 +27,7 @@
         "NSCameraUsageDescription": "This app needs access to your camera to take photos of football fields.",
         "NSPhotoLibraryUsageDescription": "This app needs access to your photo library to select photos of football fields."
       },
-      "associatedDomains": [
-        "applinks:downtoplay.app"
-      ],
+      "associatedDomains": ["applinks:downtoplay.app"],
       "config": {
         "usesNonExemptEncryption": false
       }
@@ -63,10 +59,7 @@
               "scheme": "downtoplay"
             }
           ],
-          "category": [
-            "BROWSABLE",
-            "DEFAULT"
-          ]
+          "category": ["BROWSABLE", "DEFAULT"]
         }
       ]
     },
@@ -90,7 +83,8 @@
           "cameraPermission": "Allow $(PRODUCT_NAME) to use your camera to take field photos."
         }
       ],
-      "expo-font"
+      "expo-font",
+      "@novastera-oss/rn-google-signin"
     ],
     "extra": {
       "eas": {

@@ -4,3 +4,6 @@ export { Checkbox } from './Checkbox';
 export { SurfaceTypePicker } from './SurfaceTypePicker';
 export { ImagePickerComponent } from './ImagePicker';
 export { Snackbar } from './Snackbar';
+export { LoginModal } from './LoginModal';
+export { ProfileButton } from './ProfileButton';
+export { ProfileDrawer } from './ProfileDrawer';
