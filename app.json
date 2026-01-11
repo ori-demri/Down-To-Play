@@ -84,7 +84,13 @@
         }
       ],
       "expo-font",
-      "@novastera-oss/rn-google-signin"
+      [
+        "@novastera-oss/rn-google-signin",
+        {
+          "iosUrlScheme": "com.googleusercontent.apps.141802953648-qf5v5t4f4cdrqfbmtdml0p92bsh9sg7c"
+        }
+      ],
+      "@maplibre/maplibre-react-native"
     ],
     "extra": {
       "eas": {

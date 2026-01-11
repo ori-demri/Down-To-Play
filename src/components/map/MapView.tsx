@@ -1,9 +1,16 @@
 import React, { useRef, useCallback, useState, useEffect, memo } from 'react';
 import { StyleSheet, View, ActivityIndicator, Text, TouchableOpacity } from 'react-native';
-import RNMapView, { Region } from 'react-native-maps';
+import MapLibreGL from '@maplibre/maplibre-react-native';
 import { colors, spacing, borderRadius, typography, MAP_CONFIG } from '@/constants';
 import { Field, Coordinates } from '@/types';
 import { FieldMarker } from './FieldMarker';
+
+// Initialize MapLibre
+MapLibreGL.setAccessToken(null);
+
+// Clean, modern map style (similar to Google Maps)
+// Using OpenFreeMap Positron - clean, light style
+const MAP_STYLE = 'https://tiles.openfreemap.org/styles/positron';
 
 interface MapViewProps {
   fields: Field[];
@@ -11,7 +18,7 @@ interface MapViewProps {
   isLoadingLocation: boolean;
   onFieldSelect: (field: Field) => void;
   selectedFieldId?: string | null;
-  onRegionChange?: (region: Region) => void;
+  onRegionChange?: (region: { latitude: number; longitude: number }) => void;
 }
 
 function MapViewComponent({
@@ -22,20 +29,17 @@ function MapViewComponent({
   selectedFieldId,
   onRegionChange,
 }: MapViewProps) {
-  const mapRef = useRef<RNMapView>(null);
+  const cameraRef = useRef<MapLibreGL.CameraRef>(null);
   const [isMapReady, setIsMapReady] = useState(false);
 
   // Center map on user location when it becomes available
   useEffect(() => {
-    if (userLocation && isMapReady && mapRef.current) {
-      mapRef.current.animateToRegion(
-        {
-          latitude: userLocation.latitude,
-          longitude: userLocation.longitude,
-          ...MAP_CONFIG.userLocationDelta,
-        },
-        1000
-      );
+    if (userLocation && isMapReady && cameraRef.current) {
+      cameraRef.current.setCamera({
+        centerCoordinate: [userLocation.longitude, userLocation.latitude],
+        zoomLevel: 14,
+        animationDuration: 1000,
+      });
     }
   }, [userLocation, isMapReady]);
 
@@ -44,46 +48,50 @@ function MapViewComponent({
   }, []);
 
   const handleCenterOnUser = useCallback(() => {
-    if (userLocation && mapRef.current) {
-      mapRef.current.animateToRegion(
-        {
-          latitude: userLocation.latitude,
-          longitude: userLocation.longitude,
-          ...MAP_CONFIG.userLocationDelta,
-        },
-        500
-      );
+    if (userLocation && cameraRef.current) {
+      cameraRef.current.setCamera({
+        centerCoordinate: [userLocation.longitude, userLocation.latitude],
+        zoomLevel: 14,
+        animationDuration: 500,
+      });
     }
   }, [userLocation]);
 
-  const handleRegionChangeComplete = useCallback(
-    (region: Region) => {
-      onRegionChange?.(region);
+  const handleRegionDidChange = useCallback(
+    (feature: GeoJSON.Feature<GeoJSON.Point>) => {
+      if (feature.geometry.type === 'Point') {
+        const [longitude, latitude] = feature.geometry.coordinates;
+        onRegionChange?.({ latitude, longitude });
+      }
     },
     [onRegionChange]
   );
 
-  const initialRegion = userLocation
-    ? {
-        latitude: userLocation.latitude,
-        longitude: userLocation.longitude,
-        ...MAP_CONFIG.userLocationDelta,
-      }
-    : MAP_CONFIG.defaultRegion;
+  const defaultCenter: [number, number] = userLocation
+    ? [userLocation.longitude, userLocation.latitude]
+    : [MAP_CONFIG.defaultRegion.longitude, MAP_CONFIG.defaultRegion.latitude];
+
+  const defaultZoom = userLocation ? 14 : 10;
 
   return (
     <View style={styles.container}>
-      <RNMapView
-        ref={mapRef}
+      <MapLibreGL.MapView
         style={styles.map}
-        initialRegion={initialRegion}
-        showsUserLocation={true}
-        showsMyLocationButton={false}
-        showsCompass={true}
-        showsScale={true}
-        onMapReady={handleMapReady}
-        onRegionChangeComplete={handleRegionChangeComplete}
+        mapStyle={MAP_STYLE}
+        logoEnabled={false}
+        attributionEnabled={true}
+        attributionPosition={{ bottom: 8, right: 8 }}
+        onDidFinishLoadingMap={handleMapReady}
+        onRegionDidChange={handleRegionDidChange}
       >
+        <MapLibreGL.Camera
+          ref={cameraRef}
+          defaultSettings={{
+            centerCoordinate: defaultCenter,
+            zoomLevel: defaultZoom,
+          }}
+        />
+        <MapLibreGL.UserLocation visible={true} />
         {fields.map((field) => (
           <FieldMarker
             key={field.id}
@@ -92,7 +100,7 @@ function MapViewComponent({
             onPress={onFieldSelect}
           />
         ))}
-      </RNMapView>
+      </MapLibreGL.MapView>
 
       {/* Center on user location button */}
       {userLocation && (
