@@ -1,8 +1,11 @@
 import React, { useRef, useState, useCallback, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
-import RNMapView, { Region } from 'react-native-maps';
+import MapLibreGL from '@maplibre/maplibre-react-native';
 import { colors, spacing, borderRadius, typography, MAP_CONFIG } from '@/constants';
 import { Coordinates } from '@/types';
+
+// Clean, modern map style (same as MapView)
+const MAP_STYLE = 'https://tiles.openfreemap.org/styles/positron';
 
 interface LocationPickerProps {
   value: Coordinates;
@@ -19,21 +22,18 @@ export function LocationPicker({
   error,
   isLoadingLocation = false,
 }: LocationPickerProps) {
-  const mapRef = useRef<RNMapView>(null);
+  const cameraRef = useRef<MapLibreGL.CameraRef>(null);
   const [isMapReady, setIsMapReady] = useState(false);
 
   // Center on user location when it becomes available and value is not set
   useEffect(() => {
     if (userLocation && isMapReady && value.latitude === 0 && value.longitude === 0) {
       onChange(userLocation);
-      mapRef.current?.animateToRegion(
-        {
-          latitude: userLocation.latitude,
-          longitude: userLocation.longitude,
-          ...MAP_CONFIG.userLocationDelta,
-        },
-        500
-      );
+      cameraRef.current?.setCamera({
+        centerCoordinate: [userLocation.longitude, userLocation.latitude],
+        zoomLevel: 14,
+        animationDuration: 500,
+      });
     }
   }, [userLocation, isMapReady, value, onChange]);
 
@@ -41,44 +41,38 @@ export function LocationPicker({
     setIsMapReady(true);
   }, []);
 
-  const handleRegionChangeComplete = useCallback(
-    (region: Region) => {
-      onChange({
-        latitude: region.latitude,
-        longitude: region.longitude,
-      });
+  const handleRegionDidChange = useCallback(
+    (feature: GeoJSON.Feature<GeoJSON.Point>) => {
+      if (feature.geometry.type === 'Point') {
+        const [longitude, latitude] = feature.geometry.coordinates;
+        onChange({
+          latitude,
+          longitude,
+        });
+      }
     },
     [onChange]
   );
 
   const handleCenterOnUser = useCallback(() => {
-    if (userLocation && mapRef.current) {
+    if (userLocation && cameraRef.current) {
       onChange(userLocation);
-      mapRef.current.animateToRegion(
-        {
-          latitude: userLocation.latitude,
-          longitude: userLocation.longitude,
-          ...MAP_CONFIG.userLocationDelta,
-        },
-        500
-      );
+      cameraRef.current.setCamera({
+        centerCoordinate: [userLocation.longitude, userLocation.latitude],
+        zoomLevel: 14,
+        animationDuration: 500,
+      });
     }
   }, [userLocation, onChange]);
 
-  const initialRegion =
+  const defaultCenter: [number, number] =
     value.latitude !== 0
-      ? {
-          latitude: value.latitude,
-          longitude: value.longitude,
-          ...MAP_CONFIG.userLocationDelta,
-        }
+      ? [value.longitude, value.latitude]
       : userLocation
-        ? {
-            latitude: userLocation.latitude,
-            longitude: userLocation.longitude,
-            ...MAP_CONFIG.userLocationDelta,
-          }
-        : MAP_CONFIG.defaultRegion;
+        ? [userLocation.longitude, userLocation.latitude]
+        : [MAP_CONFIG.defaultRegion.longitude, MAP_CONFIG.defaultRegion.latitude];
+
+  const defaultZoom = value.latitude !== 0 || userLocation ? 14 : 10;
 
   return (
     <View style={styles.container}>
@@ -86,15 +80,23 @@ export function LocationPicker({
       <Text style={styles.hint}>Drag the map to position the pin on the field location</Text>
 
       <View style={styles.mapContainer}>
-        <RNMapView
-          ref={mapRef}
+        <MapLibreGL.MapView
           style={styles.map}
-          initialRegion={initialRegion}
-          showsUserLocation={true}
-          showsMyLocationButton={false}
-          onMapReady={handleMapReady}
-          onRegionChangeComplete={handleRegionChangeComplete}
-        />
+          mapStyle={MAP_STYLE}
+          logoEnabled={false}
+          attributionEnabled={false}
+          onDidFinishLoadingMap={handleMapReady}
+          onRegionDidChange={handleRegionDidChange}
+        >
+          <MapLibreGL.Camera
+            ref={cameraRef}
+            defaultSettings={{
+              centerCoordinate: defaultCenter,
+              zoomLevel: defaultZoom,
+            }}
+          />
+          <MapLibreGL.UserLocation visible={true} />
+        </MapLibreGL.MapView>
 
         {/* Center pin indicator */}
         <View style={styles.pinContainer} pointerEvents="none">
