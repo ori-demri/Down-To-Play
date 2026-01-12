@@ -1,0 +1,3 @@
+- Add "Pagination" to the fields loading, load by the current location radius.
+- Add "my fields" feature.
+- Fix the flickering issue when changing theme.
