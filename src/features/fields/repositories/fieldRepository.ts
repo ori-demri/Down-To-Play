@@ -50,8 +50,8 @@ class FieldRepository {
       // Step 1: Create the field record
       onProgress?.(5);
 
-      // Anonymous uploads are active immediately (for dev), authenticated users go through moderation
-      const status = userId ? 'pending' : 'active';
+      // All uploads are active immediately (moderation can be added later)
+      const status = 'active';
 
       const fieldData = {
         name: formData.name.trim(),

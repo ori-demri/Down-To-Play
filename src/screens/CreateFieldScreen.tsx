@@ -19,9 +19,11 @@ import {
   Snackbar,
 } from '@/components/ui';
 import { LocationPicker } from '@/components/ui/LocationPicker';
-import { colors, spacing, borderRadius, typography } from '@/constants';
+import { spacing, borderRadius, typography, ThemeColors } from '@/constants';
 import { useAuth } from '@/features/auth';
 import { useCreateField } from '@/features/fields/hooks/useCreateField';
+import { useFields } from '@/features/fields/hooks/useFields';
+import { useTheme, useThemedStyles } from '@/features/theme';
 import { useLocation } from '@/hooks';
 import { SurfaceType } from '@/types';
 
@@ -32,7 +34,10 @@ interface CreateFieldScreenProps {
 
 export function CreateFieldScreen({ onClose, onSuccess }: CreateFieldScreenProps) {
   const { coordinates: userLocation, isLoading: isLoadingLocation } = useLocation();
+  const { fields } = useFields(userLocation);
   const { user } = useAuth();
+  const { colors, isDark } = useTheme();
+  const themedStyles = useThemedStyles(createThemedStyles, isDark);
 
   const {
     formData,
@@ -65,13 +70,13 @@ export function CreateFieldScreen({ onClose, onSuccess }: CreateFieldScreenProps
   );
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={themedStyles.container}>
       {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity onPress={onClose} style={styles.closeButton}>
-          <Text style={styles.closeButtonText}>✕</Text>
+      <View style={themedStyles.header}>
+        <TouchableOpacity onPress={onClose} style={themedStyles.closeButton}>
+          <Text style={themedStyles.closeButtonText}>✕</Text>
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Add Football Field</Text>
+        <Text style={themedStyles.headerTitle}>Add Football Field</Text>
         <View style={styles.headerRight} />
       </View>
 
@@ -86,9 +91,9 @@ export function CreateFieldScreen({ onClose, onSuccess }: CreateFieldScreenProps
           keyboardShouldPersistTaps="handled"
         >
           {/* Introduction */}
-          <View style={styles.intro}>
-            <Text style={styles.introTitle}>Help grow the community! 🌱</Text>
-            <Text style={styles.introText}>
+          <View style={themedStyles.intro}>
+            <Text style={themedStyles.introTitle}>Help grow the community! 🌱</Text>
+            <Text style={themedStyles.introText}>
               Share a public football field and help others discover great places to play. Your
               submission will be reviewed before being published.
             </Text>
@@ -101,6 +106,7 @@ export function CreateFieldScreen({ onClose, onSuccess }: CreateFieldScreenProps
             userLocation={userLocation}
             isLoadingLocation={isLoadingLocation}
             error={errors.coordinates}
+            fields={fields}
           />
 
           {/* Field Name */}
@@ -144,7 +150,7 @@ export function CreateFieldScreen({ onClose, onSuccess }: CreateFieldScreenProps
 
           {/* Amenities Section */}
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Amenities & Features</Text>
+            <Text style={themedStyles.sectionTitle}>Amenities & Features</Text>
 
             <Checkbox
               label="Free to use"
@@ -212,9 +218,9 @@ export function CreateFieldScreen({ onClose, onSuccess }: CreateFieldScreenProps
             {isSubmitting ? (
               <View style={styles.progressContainer}>
                 <ActivityIndicator size="small" color={colors.primary} />
-                <Text style={styles.progressText}>Uploading... {uploadProgress}%</Text>
-                <View style={styles.progressBar}>
-                  <View style={[styles.progressFill, { width: `${uploadProgress}%` }]} />
+                <Text style={themedStyles.progressText}>Uploading... {uploadProgress}%</Text>
+                <View style={themedStyles.progressBar}>
+                  <View style={[themedStyles.progressFill, { width: `${uploadProgress}%` }]} />
                 </View>
               </View>
             ) : (
@@ -228,7 +234,7 @@ export function CreateFieldScreen({ onClose, onSuccess }: CreateFieldScreenProps
           </View>
 
           {/* Disclaimer */}
-          <Text style={styles.disclaimer}>
+          <Text style={themedStyles.disclaimer}>
             By submitting, you confirm this is a public football field and the information provided
             is accurate. Submissions are reviewed before being published.
           </Text>
@@ -247,85 +253,16 @@ export function CreateFieldScreen({ onClose, onSuccess }: CreateFieldScreenProps
   );
 }
 
+// Static styles that don't depend on theme
 const styles = StyleSheet.create({
-  closeButton: {
-    alignItems: 'center',
-    backgroundColor: colors.surface,
-    borderRadius: 20,
-    height: 40,
-    justifyContent: 'center',
-    width: 40,
-  },
-  closeButtonText: {
-    color: colors.text.secondary,
-    fontSize: 18,
-  },
-  container: {
-    backgroundColor: colors.background,
-    flex: 1,
-  },
-  disclaimer: {
-    color: colors.text.muted,
-    fontSize: typography.sizes.xs,
-    lineHeight: 16,
-    textAlign: 'center',
-  },
-  header: {
-    alignItems: 'center',
-    borderBottomColor: colors.border,
-    borderBottomWidth: 1,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.md,
-  },
   headerRight: {
     width: 40,
-  },
-  headerTitle: {
-    color: colors.text.primary,
-    fontSize: typography.sizes.lg,
-    fontWeight: typography.weights.semibold,
-  },
-  intro: {
-    backgroundColor: colors.primaryLight + '15',
-    borderRadius: borderRadius.lg,
-    marginBottom: spacing.lg,
-    padding: spacing.md,
-  },
-  introText: {
-    color: colors.text.secondary,
-    fontSize: typography.sizes.sm,
-    lineHeight: 20,
-  },
-  introTitle: {
-    color: colors.primary,
-    fontSize: typography.sizes.lg,
-    fontWeight: typography.weights.semibold,
-    marginBottom: spacing.xs,
   },
   keyboardView: {
     flex: 1,
   },
-  progressBar: {
-    backgroundColor: colors.surface,
-    borderRadius: 2,
-    height: 4,
-    overflow: 'hidden',
-    width: '100%',
-  },
   progressContainer: {
     alignItems: 'center',
-  },
-  progressFill: {
-    backgroundColor: colors.primary,
-    height: '100%',
-  },
-  progressText: {
-    color: colors.text.secondary,
-    fontSize: typography.sizes.sm,
-    marginBottom: spacing.sm,
-    marginTop: spacing.sm,
   },
   scrollContent: {
     padding: spacing.lg,
@@ -337,14 +274,91 @@ const styles = StyleSheet.create({
   section: {
     marginBottom: spacing.md,
   },
-  sectionTitle: {
-    color: colors.text.primary,
-    fontSize: typography.sizes.md,
-    fontWeight: typography.weights.semibold,
-    marginBottom: spacing.sm,
-  },
   submitContainer: {
     marginBottom: spacing.md,
     marginTop: spacing.lg,
   },
 });
+
+/* eslint-disable react-native/no-unused-styles */
+// Dynamic styles that depend on theme colors
+const createThemedStyles = (colors: ThemeColors) =>
+  StyleSheet.create({
+    closeButton: {
+      alignItems: 'center',
+      backgroundColor: colors.surface,
+      borderRadius: 20,
+      height: 40,
+      justifyContent: 'center',
+      width: 40,
+    },
+    closeButtonText: {
+      color: colors.text.secondary,
+      fontSize: 18,
+    },
+    container: {
+      backgroundColor: colors.background,
+      flex: 1,
+    },
+    disclaimer: {
+      color: colors.text.muted,
+      fontSize: typography.sizes.xs,
+      lineHeight: 16,
+      textAlign: 'center',
+    },
+    header: {
+      alignItems: 'center',
+      borderBottomColor: colors.border,
+      borderBottomWidth: 1,
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      paddingHorizontal: spacing.md,
+      paddingVertical: spacing.md,
+    },
+    headerTitle: {
+      color: colors.text.primary,
+      fontSize: typography.sizes.lg,
+      fontWeight: typography.weights.semibold,
+    },
+    intro: {
+      backgroundColor: colors.primaryLight + '15',
+      borderRadius: borderRadius.lg,
+      marginBottom: spacing.lg,
+      padding: spacing.md,
+    },
+    introText: {
+      color: colors.text.secondary,
+      fontSize: typography.sizes.sm,
+      lineHeight: 20,
+    },
+    introTitle: {
+      color: colors.primary,
+      fontSize: typography.sizes.lg,
+      fontWeight: typography.weights.semibold,
+      marginBottom: spacing.xs,
+    },
+    progressBar: {
+      backgroundColor: colors.surface,
+      borderRadius: 2,
+      height: 4,
+      overflow: 'hidden',
+      width: '100%',
+    },
+    progressFill: {
+      backgroundColor: colors.primary,
+      height: '100%',
+    },
+    progressText: {
+      color: colors.text.secondary,
+      fontSize: typography.sizes.sm,
+      marginBottom: spacing.sm,
+      marginTop: spacing.sm,
+    },
+    sectionTitle: {
+      color: colors.text.primary,
+      fontSize: typography.sizes.md,
+      fontWeight: typography.weights.semibold,
+      marginBottom: spacing.sm,
+    },
+  });
+/* eslint-enable react-native/no-unused-styles */

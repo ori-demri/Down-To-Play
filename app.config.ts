@@ -1,0 +1,120 @@
+import 'dotenv/config';
+import { ExpoConfig, ConfigContext } from 'expo/config';
+
+export default (_config: ConfigContext): ExpoConfig => {
+  const googleMapsApiKey = process.env.GOOGLE_MAPS_API_KEY;
+
+  if (!googleMapsApiKey) {
+    console.warn(
+      '⚠️  GOOGLE_MAPS_API_KEY is not set in your .env file. Maps will not work properly.'
+    );
+  }
+
+  return {
+    name: 'Down To Play',
+    slug: 'down-to-play',
+    version: '1.0.0',
+    scheme: 'downtoplay',
+    orientation: 'portrait',
+    icon: './assets/icon.png',
+    userInterfaceStyle: 'light',
+    newArchEnabled: true,
+    splash: {
+      image: './assets/splash-icon.png',
+      resizeMode: 'contain',
+      backgroundColor: '#ffffff',
+    },
+    ios: {
+      supportsTablet: true,
+      bundleIdentifier: 'com.downtoplay.app',
+      infoPlist: {
+        CFBundleURLTypes: [
+          {
+            CFBundleURLSchemes: ['downtoplay'],
+          },
+        ],
+        NSLocationWhenInUseUsageDescription:
+          'This app needs access to your location to show nearby football fields.',
+        NSLocationAlwaysAndWhenInUseUsageDescription:
+          'This app needs access to your location to show nearby football fields.',
+        NSCameraUsageDescription:
+          'This app needs access to your camera to take photos of football fields.',
+        NSPhotoLibraryUsageDescription:
+          'This app needs access to your photo library to select photos of football fields.',
+      },
+      associatedDomains: ['applinks:downtoplay.app'],
+      config: {
+        usesNonExemptEncryption: false,
+        googleMapsApiKey: googleMapsApiKey,
+      },
+    },
+    android: {
+      config: {
+        googleMaps: {
+          apiKey: googleMapsApiKey,
+        },
+      },
+      adaptiveIcon: {
+        foregroundImage: './assets/adaptive-icon.png',
+        backgroundColor: '#ffffff',
+      },
+      edgeToEdgeEnabled: true,
+      predictiveBackGestureEnabled: false,
+      package: 'com.downtoplay.app',
+      permissions: [
+        'android.permission.ACCESS_FINE_LOCATION',
+        'android.permission.ACCESS_COARSE_LOCATION',
+        'android.permission.CAMERA',
+        'android.permission.READ_EXTERNAL_STORAGE',
+        'android.permission.WRITE_EXTERNAL_STORAGE',
+        'android.permission.RECORD_AUDIO',
+      ],
+      intentFilters: [
+        {
+          action: 'VIEW',
+          autoVerify: true,
+          data: [
+            {
+              scheme: 'downtoplay',
+            },
+          ],
+          category: ['BROWSABLE', 'DEFAULT'],
+        },
+      ],
+    },
+    web: {
+      favicon: './assets/favicon.png',
+    },
+    updates: {
+      enabled: false,
+    },
+    plugins: [
+      [
+        'expo-location',
+        {
+          locationAlwaysAndWhenInUsePermission:
+            'Allow $(PRODUCT_NAME) to use your location to find nearby football fields.',
+        },
+      ],
+      [
+        'expo-image-picker',
+        {
+          photosPermission: 'Allow $(PRODUCT_NAME) to access your photos to add field images.',
+          cameraPermission: 'Allow $(PRODUCT_NAME) to use your camera to take field photos.',
+        },
+      ],
+      'expo-font',
+      [
+        '@novastera-oss/rn-google-signin',
+        {
+          iosUrlScheme: 'com.googleusercontent.apps.141802953648-qf5v5t4f4cdrqfbmtdml0p92bsh9sg7c',
+        },
+      ],
+    ],
+    extra: {
+      eas: {
+        projectId: '2dbc7c1e-06cc-4697-8e4a-d4fd2206275e',
+      },
+    },
+  };
+};

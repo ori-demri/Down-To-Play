@@ -1,6 +1,7 @@
 import React from 'react';
 import { TouchableOpacity, Text, StyleSheet, ViewStyle } from 'react-native';
-import { colors, spacing } from '@/constants';
+import { spacing, ThemeColors } from '@/constants';
+import { useTheme, useThemedStyles } from '@/features/theme';
 
 interface FloatingActionButtonProps {
   onPress: () => void;
@@ -17,10 +18,13 @@ export function FloatingActionButton({
   style,
   disabled = false,
 }: FloatingActionButtonProps) {
+  const { isDark } = useTheme();
+  const themedStyles = useThemedStyles(createThemedStyles, isDark);
+
   return (
     <TouchableOpacity
       style={[
-        styles.container,
+        themedStyles.container,
         label ? styles.extended : styles.circular,
         disabled && styles.disabled,
         style,
@@ -29,8 +33,8 @@ export function FloatingActionButton({
       activeOpacity={0.8}
       disabled={disabled}
     >
-      <Text style={styles.icon}>{icon}</Text>
-      {label && <Text style={styles.label}>{label}</Text>}
+      <Text style={themedStyles.icon}>{icon}</Text>
+      {label && <Text style={themedStyles.label}>{label}</Text>}
     </TouchableOpacity>
   );
 }
@@ -43,18 +47,6 @@ const styles = StyleSheet.create({
     right: spacing.md,
     width: 56, // Above the center button
   },
-  container: {
-    alignItems: 'center',
-    backgroundColor: colors.primary,
-    elevation: 8,
-    flexDirection: 'row',
-    justifyContent: 'center',
-    position: 'absolute',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 6,
-  },
   disabled: {
     opacity: 0.5,
   },
@@ -65,14 +57,32 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.md,
     right: spacing.md,
   },
-  icon: {
-    color: colors.text.inverse,
-    fontSize: 24,
-  },
-  label: {
-    color: colors.text.inverse,
-    fontSize: 14,
-    fontWeight: '600',
-    marginLeft: spacing.sm,
-  },
 });
+
+/* eslint-disable react-native/no-unused-styles */
+const createThemedStyles = (colors: ThemeColors) =>
+  StyleSheet.create({
+    container: {
+      alignItems: 'center',
+      backgroundColor: colors.primary,
+      elevation: 8,
+      flexDirection: 'row',
+      justifyContent: 'center',
+      position: 'absolute',
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.3,
+      shadowRadius: 6,
+    },
+    icon: {
+      color: colors.text.inverse,
+      fontSize: 24,
+    },
+    label: {
+      color: colors.text.inverse,
+      fontSize: 14,
+      fontWeight: '600',
+      marginLeft: spacing.sm,
+    },
+  });
+/* eslint-enable react-native/no-unused-styles */

@@ -13,9 +13,9 @@ import { FloatingActionButton } from '@/components/ui/FloatingActionButton';
 import { LoginModal } from '@/components/ui/LoginModal';
 import { ProfileButton } from '@/components/ui/ProfileButton';
 import { ProfileDrawer } from '@/components/ui/ProfileDrawer';
-import { colors } from '@/constants';
 import { useAuth, useRequireAuth } from '@/features/auth';
 import { useFields } from '@/features/fields/hooks/useFields';
+import { useTheme } from '@/features/theme';
 import { useLocation } from '@/hooks';
 import { Field } from '@/types';
 import { CreateFieldScreen } from './CreateFieldScreen';
@@ -25,6 +25,7 @@ export function MapScreen() {
   const { fields, isLoading: isLoadingFields, refetch: refetchFields } = useFields(coordinates);
   const { isAuthenticated, consumeAuthIntent } = useAuth();
   const { showLoginModal, closeLoginModal, checkAuth } = useRequireAuth();
+  const { colors, isDark, mapStyle } = useTheme();
 
   const [selectedField, setSelectedField] = useState<Field | null>(null);
   const [isCreateFieldVisible, setIsCreateFieldVisible] = useState(false);
@@ -97,8 +98,11 @@ export function MapScreen() {
   }, [consumeAuthIntent]);
 
   return (
-    <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="dark-content" backgroundColor={colors.background} />
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
+      <StatusBar
+        barStyle={isDark ? 'light-content' : 'dark-content'}
+        backgroundColor={colors.background}
+      />
 
       <View style={styles.mapContainer}>
         <MapView
@@ -107,6 +111,7 @@ export function MapScreen() {
           isLoadingLocation={isLoadingLocation || isLoadingFields}
           onFieldSelect={handleFieldSelect}
           selectedFieldId={selectedField?.id}
+          customMapStyle={mapStyle}
         />
 
         {/* Profile button (top left) */}
@@ -154,7 +159,6 @@ export function MapScreen() {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: colors.background,
     flex: 1,
   },
   mapContainer: {

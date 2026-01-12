@@ -5,6 +5,15 @@
 import { Session, User } from '@supabase/supabase-js';
 
 // ============================================
+// Appearance Types
+// ============================================
+
+/**
+ * User appearance preference
+ */
+export type AppearancePreference = 'light' | 'dark' | 'system';
+
+// ============================================
 // User Profile Types
 // ============================================
 
@@ -16,6 +25,7 @@ export interface UserProfile {
   username: string;
   displayName: string | null;
   avatarUrl: string | null;
+  appearance: AppearancePreference;
   createdAt: string;
   updatedAt: string;
 }
@@ -28,6 +38,7 @@ export interface ProfileRow {
   username: string;
   display_name: string | null;
   avatar_url: string | null;
+  appearance: AppearancePreference;
   created_at: string;
   updated_at: string;
 }
@@ -126,4 +137,5 @@ export interface UpdateProfileData {
   displayName?: string;
   avatarUrl?: string;
   username?: string;
+  appearance?: AppearancePreference;
 }

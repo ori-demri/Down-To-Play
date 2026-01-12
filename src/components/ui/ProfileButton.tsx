@@ -5,8 +5,9 @@
 
 import React from 'react';
 import { TouchableOpacity, View, Text, Image, StyleSheet } from 'react-native';
-import { colors, typography } from '@/constants';
+import { typography, ThemeColors } from '@/constants';
 import { useAuth } from '@/features/auth';
+import { useTheme, useThemedStyles } from '@/features/theme';
 
 interface ProfileButtonProps {
   onPress: () => void;
@@ -14,6 +15,8 @@ interface ProfileButtonProps {
 
 export function ProfileButton({ onPress }: ProfileButtonProps) {
   const { isAuthenticated, profile } = useAuth();
+  const { isDark } = useTheme();
+  const themedStyles = useThemedStyles(createThemedStyles, isDark);
 
   return (
     <TouchableOpacity style={styles.container} onPress={onPress} activeOpacity={0.8}>
@@ -22,15 +25,15 @@ export function ProfileButton({ onPress }: ProfileButtonProps) {
         profile.avatarUrl ? (
           <Image source={{ uri: profile.avatarUrl }} style={styles.avatar} />
         ) : (
-          <View style={styles.avatarPlaceholder}>
-            <Text style={styles.avatarInitial}>
+          <View style={themedStyles.avatarPlaceholder}>
+            <Text style={themedStyles.avatarInitial}>
               {profile.displayName?.[0]?.toUpperCase() || profile.username[0].toUpperCase()}
             </Text>
           </View>
         )
       ) : (
         // Guest - show sign in icon
-        <View style={styles.guestContainer}>
+        <View style={themedStyles.guestContainer}>
           <Text style={styles.guestIcon}>👤</Text>
         </View>
       )}
@@ -44,19 +47,6 @@ const styles = StyleSheet.create({
     height: 40,
     width: 40,
   },
-  avatarInitial: {
-    color: colors.primary,
-    fontSize: typography.sizes.md,
-    fontWeight: typography.weights.semibold,
-  },
-  avatarPlaceholder: {
-    alignItems: 'center',
-    backgroundColor: colors.primary + '20',
-    borderRadius: 20,
-    height: 40,
-    justifyContent: 'center',
-    width: 40,
-  },
   container: {
     elevation: 3,
     shadowColor: '#000',
@@ -64,15 +54,34 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.15,
     shadowRadius: 4,
   },
-  guestContainer: {
-    alignItems: 'center',
-    backgroundColor: colors.background,
-    borderRadius: 20,
-    height: 40,
-    justifyContent: 'center',
-    width: 40,
-  },
   guestIcon: {
     fontSize: 20,
   },
 });
+
+/* eslint-disable react-native/no-unused-styles */
+const createThemedStyles = (colors: ThemeColors) =>
+  StyleSheet.create({
+    avatarInitial: {
+      color: colors.primary,
+      fontSize: typography.sizes.md,
+      fontWeight: typography.weights.semibold,
+    },
+    avatarPlaceholder: {
+      alignItems: 'center',
+      backgroundColor: colors.primary + '20',
+      borderRadius: 20,
+      height: 40,
+      justifyContent: 'center',
+      width: 40,
+    },
+    guestContainer: {
+      alignItems: 'center',
+      backgroundColor: colors.background,
+      borderRadius: 20,
+      height: 40,
+      justifyContent: 'center',
+      width: 40,
+    },
+  });
+/* eslint-enable react-native/no-unused-styles */

@@ -1,8 +1,9 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView, Alert } from 'react-native';
-import { colors, spacing, borderRadius, typography } from '@/constants';
+import { spacing, borderRadius, typography, ThemeColors } from '@/constants';
 import { imageService } from '@/features/fields';
 import { SelectedImage } from '@/features/fields/types';
+import { useTheme, useThemedStyles } from '@/features/theme';
 
 interface ImagePickerProps {
   images: SelectedImage[];
@@ -17,6 +18,8 @@ export function ImagePickerComponent({
   maxImages = 5,
   error,
 }: ImagePickerProps) {
+  const { isDark } = useTheme();
+  const themedStyles = useThemedStyles(createThemedStyles, isDark);
   const canAddMore = images.length < maxImages;
 
   const handleAddImage = () => {
@@ -75,13 +78,13 @@ export function ImagePickerComponent({
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.label}>Photos *</Text>
-        <Text style={styles.counter}>
+        <Text style={themedStyles.label}>Photos *</Text>
+        <Text style={themedStyles.counter}>
           {images.length}/{maxImages}
         </Text>
       </View>
 
-      <Text style={styles.hint}>
+      <Text style={themedStyles.hint}>
         Add at least one photo of the field. The first photo will be the main image.
       </Text>
 
@@ -95,26 +98,29 @@ export function ImagePickerComponent({
           <View key={image.uri} style={styles.imageContainer}>
             <Image source={{ uri: image.uri }} style={styles.image} />
             {index === 0 && (
-              <View style={styles.primaryBadge}>
-                <Text style={styles.primaryBadgeText}>Main</Text>
+              <View style={themedStyles.primaryBadge}>
+                <Text style={themedStyles.primaryBadgeText}>Main</Text>
               </View>
             )}
-            <TouchableOpacity style={styles.removeButton} onPress={() => handleRemoveImage(index)}>
-              <Text style={styles.removeButtonText}>✕</Text>
+            <TouchableOpacity
+              style={themedStyles.removeButton}
+              onPress={() => handleRemoveImage(index)}
+            >
+              <Text style={themedStyles.removeButtonText}>✕</Text>
             </TouchableOpacity>
           </View>
         ))}
 
         {/* Add button */}
         {canAddMore && (
-          <TouchableOpacity style={styles.addButton} onPress={handleAddImage}>
+          <TouchableOpacity style={themedStyles.addButton} onPress={handleAddImage}>
             <Text style={styles.addButtonIcon}>📷</Text>
-            <Text style={styles.addButtonText}>Add Photo</Text>
+            <Text style={themedStyles.addButtonText}>Add Photo</Text>
           </TouchableOpacity>
         )}
       </ScrollView>
 
-      {error && <Text style={styles.error}>{error}</Text>}
+      {error && <Text style={themedStyles.error}>{error}</Text>}
     </View>
   );
 }
@@ -122,47 +128,18 @@ export function ImagePickerComponent({
 const IMAGE_SIZE = 120;
 
 const styles = StyleSheet.create({
-  addButton: {
-    alignItems: 'center',
-    backgroundColor: colors.surface,
-    borderColor: colors.border,
-    borderRadius: borderRadius.md,
-    borderStyle: 'dashed',
-    borderWidth: 2,
-    height: IMAGE_SIZE,
-    justifyContent: 'center',
-    width: IMAGE_SIZE,
-  },
   addButtonIcon: {
     fontSize: 32,
     marginBottom: spacing.xs,
   },
-  addButtonText: {
-    color: colors.text.secondary,
-    fontSize: typography.sizes.sm,
-  },
   container: {
     marginBottom: spacing.md,
-  },
-  counter: {
-    color: colors.text.muted,
-    fontSize: typography.sizes.sm,
-  },
-  error: {
-    color: colors.error,
-    fontSize: typography.sizes.sm,
-    marginTop: spacing.sm,
   },
   header: {
     alignItems: 'center',
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginBottom: spacing.xs,
-  },
-  hint: {
-    color: colors.text.muted,
-    fontSize: typography.sizes.sm,
-    marginBottom: spacing.md,
   },
   image: {
     height: '100%',
@@ -175,42 +152,77 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     width: IMAGE_SIZE,
   },
-  label: {
-    color: colors.text.primary,
-    fontSize: typography.sizes.sm,
-    fontWeight: typography.weights.medium,
-  },
-  primaryBadge: {
-    backgroundColor: colors.primary,
-    borderRadius: borderRadius.sm,
-    left: spacing.xs,
-    paddingHorizontal: spacing.sm,
-    paddingVertical: 2,
-    position: 'absolute',
-    top: spacing.xs,
-  },
-  primaryBadgeText: {
-    color: colors.text.inverse,
-    fontSize: typography.sizes.xs,
-    fontWeight: typography.weights.bold,
-  },
-  removeButton: {
-    alignItems: 'center',
-    backgroundColor: colors.error,
-    borderRadius: 12,
-    height: 24,
-    justifyContent: 'center',
-    position: 'absolute',
-    right: spacing.xs,
-    top: spacing.xs,
-    width: 24,
-  },
-  removeButtonText: {
-    color: colors.text.inverse,
-    fontSize: 12,
-    fontWeight: typography.weights.bold,
-  },
   scrollContent: {
     paddingRight: spacing.md,
   },
 });
+
+/* eslint-disable react-native/no-unused-styles */
+const createThemedStyles = (colors: ThemeColors) =>
+  StyleSheet.create({
+    addButton: {
+      alignItems: 'center',
+      backgroundColor: colors.surface,
+      borderColor: colors.border,
+      borderRadius: borderRadius.md,
+      borderStyle: 'dashed',
+      borderWidth: 2,
+      height: IMAGE_SIZE,
+      justifyContent: 'center',
+      width: IMAGE_SIZE,
+    },
+    addButtonText: {
+      color: colors.text.secondary,
+      fontSize: typography.sizes.sm,
+    },
+    counter: {
+      color: colors.text.muted,
+      fontSize: typography.sizes.sm,
+    },
+    error: {
+      color: colors.error,
+      fontSize: typography.sizes.sm,
+      marginTop: spacing.sm,
+    },
+    hint: {
+      color: colors.text.muted,
+      fontSize: typography.sizes.sm,
+      marginBottom: spacing.md,
+    },
+    label: {
+      color: colors.text.primary,
+      fontSize: typography.sizes.sm,
+      fontWeight: typography.weights.medium,
+    },
+    primaryBadge: {
+      backgroundColor: colors.primary,
+      borderRadius: borderRadius.sm,
+      left: spacing.xs,
+      paddingHorizontal: spacing.sm,
+      paddingVertical: 2,
+      position: 'absolute',
+      top: spacing.xs,
+    },
+    primaryBadgeText: {
+      color: colors.text.inverse,
+      fontSize: typography.sizes.xs,
+      fontWeight: typography.weights.bold,
+    },
+    removeButton: {
+      alignItems: 'center',
+      backgroundColor: colors.error,
+      borderRadius: 12,
+      height: 24,
+      justifyContent: 'center',
+      position: 'absolute',
+      right: spacing.xs,
+      top: spacing.xs,
+      width: 24,
+    },
+    removeButtonText: {
+      color: colors.text.inverse,
+      fontSize: 12,
+      fontWeight: typography.weights.bold,
+    },
+  });
+/* eslint-enable react-native/no-unused-styles */

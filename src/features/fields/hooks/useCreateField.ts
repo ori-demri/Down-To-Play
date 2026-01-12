@@ -56,19 +56,17 @@ export function useCreateField(): UseCreateFieldReturn {
     [errors]
   );
 
-  const setCoordinates = useCallback(
-    (coordinates: Coordinates) => {
-      setFormData((prev) => ({ ...prev, coordinates }));
-      if (errors.coordinates) {
-        setErrors((prev) => {
-          const newErrors = { ...prev };
-          delete newErrors.coordinates;
-          return newErrors;
-        });
+  const setCoordinates = useCallback((coordinates: Coordinates) => {
+    setFormData((prev) => ({ ...prev, coordinates }));
+    setErrors((prev) => {
+      if (prev.coordinates) {
+        const newErrors = { ...prev };
+        delete newErrors.coordinates;
+        return newErrors;
       }
-    },
-    [errors]
-  );
+      return prev;
+    });
+  }, []);
 
   const validateForm = useCallback((): boolean => {
     const newErrors: CreateFieldFormErrors = {};
@@ -140,8 +138,8 @@ export function useCreateField(): UseCreateFieldReturn {
         if (result.success) {
           // Show success message
           Alert.alert(
-            'Field Submitted! 🎉',
-            'Thank you for contributing! Your field has been submitted for review and will be visible once approved.',
+            'Field Added! 🎉',
+            'Thank you for contributing! Your field is now visible on the map.',
             [{ text: 'OK' }]
           );
 

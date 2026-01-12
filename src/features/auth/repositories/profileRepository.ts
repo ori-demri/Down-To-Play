@@ -10,7 +10,7 @@ import {
   UpdateProfileData,
 } from '@/features/auth/types';
 import { supabase } from '@/infrastructure/supabase';
-import { appLogger } from '@/utils/logger';
+import { appLogger, getErrorMessage } from '@/utils/logger';
 
 /**
  * Transform database row to UserProfile
@@ -21,6 +21,7 @@ function transformProfile(row: ProfileRow): UserProfile {
     username: row.username,
     displayName: row.display_name,
     avatarUrl: row.avatar_url,
+    appearance: row.appearance,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
   };
@@ -65,7 +66,7 @@ export const profileRepository = {
     } catch (error) {
       appLogger.error('Failed to get profile', {
         userId,
-        error: error instanceof Error ? error.message : String(error),
+        error: getErrorMessage(error),
       });
       return null;
     }
@@ -93,7 +94,7 @@ export const profileRepository = {
     } catch (error) {
       appLogger.error('Failed to get profile by username', {
         username,
-        error: error instanceof Error ? error.message : String(error),
+        error: getErrorMessage(error),
       });
       return null;
     }
@@ -137,7 +138,7 @@ export const profileRepository = {
     } catch (error) {
       appLogger.error('Failed to create profile', {
         userId: data.userId,
-        error: error instanceof Error ? error.message : String(error),
+        error: getErrorMessage(error),
       });
       return null;
     }
@@ -159,6 +160,9 @@ export const profileRepository = {
       if (data.username !== undefined) {
         updateData.username = data.username;
       }
+      if (data.appearance !== undefined) {
+        updateData.appearance = data.appearance;
+      }
 
       const { data: profile, error } = await supabase
         .from('profiles')
@@ -176,7 +180,7 @@ export const profileRepository = {
     } catch (error) {
       appLogger.error('Failed to update profile', {
         userId,
-        error: error instanceof Error ? error.message : String(error),
+        error: getErrorMessage(error),
       });
       return null;
     }
@@ -227,7 +231,7 @@ export const profileRepository = {
     } catch (error) {
       appLogger.error('Failed to check username availability', {
         username,
-        error: error instanceof Error ? error.message : String(error),
+        error: getErrorMessage(error),
       });
       return false;
     }

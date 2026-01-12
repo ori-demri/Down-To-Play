@@ -10,6 +10,13 @@ CREATE EXTENSION IF NOT EXISTS postgis;
 -- ENUMS
 -- =====================================================
 
+-- Appearance preference enum
+CREATE TYPE appearance_preference AS ENUM (
+  'light',
+  'dark',
+  'system'
+);
+
 -- Surface type enum
 CREATE TYPE surface_type AS ENUM (
   'natural_grass',
@@ -40,6 +47,7 @@ CREATE TABLE IF NOT EXISTS public.profiles (
   username TEXT UNIQUE NOT NULL,
   display_name TEXT,
   avatar_url TEXT,
+  appearance appearance_preference DEFAULT 'system' NOT NULL,
   created_at TIMESTAMPTZ DEFAULT NOW() NOT NULL,
   updated_at TIMESTAMPTZ DEFAULT NOW() NOT NULL
 );

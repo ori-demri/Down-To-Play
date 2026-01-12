@@ -6,9 +6,10 @@
 import React, { useCallback, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Snackbar } from '@/components/ui';
-import { colors, spacing, borderRadius, typography } from '@/constants';
+import { Snackbar } from '@/components/ui/Snackbar';
+import { spacing, borderRadius, typography, ThemeColors } from '@/constants';
 import { useAuth } from '@/features/auth';
+import { useTheme, useThemedStyles } from '@/features/theme';
 
 interface LoginScreenProps {
   /** Called when user chooses to skip login */
@@ -21,6 +22,8 @@ interface LoginScreenProps {
 
 export function LoginScreen({ onSkip, onSuccess, showSkip = true }: LoginScreenProps) {
   const { signInWithGoogle, isLoading } = useAuth();
+  const { colors, isDark } = useTheme();
+  const themedStyles = useThemedStyles(createThemedStyles, isDark);
   const [error, setError] = useState<string | null>(null);
 
   const handleGoogleSignIn = useCallback(async () => {
@@ -40,29 +43,29 @@ export function LoginScreen({ onSkip, onSuccess, showSkip = true }: LoginScreenP
   }, [onSkip]);
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={themedStyles.container}>
       <View style={styles.content}>
         {/* Logo & Branding */}
         <View style={styles.brandingSection}>
-          <View style={styles.logoContainer}>
+          <View style={themedStyles.logoContainer}>
             <Text style={styles.logoEmoji}>⚽</Text>
           </View>
-          <Text style={styles.appName}>Down To Play</Text>
-          <Text style={styles.tagline}>Find your next game</Text>
+          <Text style={themedStyles.appName}>Down To Play</Text>
+          <Text style={themedStyles.tagline}>Find your next game</Text>
         </View>
 
         {/* Value Proposition */}
         <View style={styles.valueSection}>
-          <ValueItem icon="📍" text="Discover football fields near you" />
-          <ValueItem icon="👥" text="Connect with local players" />
-          <ValueItem icon="🏟️" text="Organize and join pickup games" />
-          <ValueItem icon="⭐" text="Rate and review playing spots" />
+          <ValueItem icon="📍" text="Discover football fields near you" colors={colors} />
+          <ValueItem icon="👥" text="Connect with local players" colors={colors} />
+          <ValueItem icon="🏟️" text="Organize and join pickup games" colors={colors} />
+          <ValueItem icon="⭐" text="Rate and review playing spots" colors={colors} />
         </View>
 
         {/* Sign In Section */}
         <View style={styles.authSection}>
           <TouchableOpacity
-            style={[styles.googleButton, isLoading && styles.googleButtonDisabled]}
+            style={[themedStyles.googleButton, isLoading && styles.googleButtonDisabled]}
             onPress={handleGoogleSignIn}
             disabled={isLoading}
             activeOpacity={0.8}
@@ -72,23 +75,24 @@ export function LoginScreen({ onSkip, onSuccess, showSkip = true }: LoginScreenP
             ) : (
               <>
                 <Text style={styles.googleIconText}>G</Text>
-                <Text style={styles.googleButtonText}>Continue with Google</Text>
+                <Text style={themedStyles.googleButtonText}>Continue with Google</Text>
               </>
             )}
           </TouchableOpacity>
 
           {showSkip && (
             <TouchableOpacity style={styles.skipButton} onPress={handleSkip} disabled={isLoading}>
-              <Text style={styles.skipButtonText}>Skip for now</Text>
+              <Text style={themedStyles.skipButtonText}>Skip for now</Text>
             </TouchableOpacity>
           )}
         </View>
 
         {/* Legal */}
         <View style={styles.legalSection}>
-          <Text style={styles.legalText}>
-            By continuing, you agree to our <Text style={styles.legalLink}>Terms of Service</Text>{' '}
-            and <Text style={styles.legalLink}>Privacy Policy</Text>
+          <Text style={themedStyles.legalText}>
+            By continuing, you agree to our{' '}
+            <Text style={themedStyles.legalLink}>Terms of Service</Text> and{' '}
+            <Text style={themedStyles.legalLink}>Privacy Policy</Text>
           </Text>
         </View>
       </View>
@@ -108,22 +112,16 @@ export function LoginScreen({ onSkip, onSuccess, showSkip = true }: LoginScreenP
 /**
  * Value proposition item component
  */
-function ValueItem({ icon, text }: { icon: string; text: string }) {
+function ValueItem({ icon, text, colors }: { icon: string; text: string; colors: ThemeColors }) {
   return (
     <View style={styles.valueItem}>
       <Text style={styles.valueIcon}>{icon}</Text>
-      <Text style={styles.valueText}>{text}</Text>
+      <Text style={[styles.valueText, { color: colors.text.primary }]}>{text}</Text>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  appName: {
-    color: colors.text.primary,
-    fontSize: 32,
-    fontWeight: typography.weights.bold,
-    marginBottom: spacing.xs,
-  },
   authSection: {
     paddingHorizontal: spacing.xl,
     width: '100%',
@@ -132,39 +130,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: spacing.xl,
   },
-  container: {
-    backgroundColor: colors.background,
-    flex: 1,
-  },
   content: {
     alignItems: 'center',
     flex: 1,
     justifyContent: 'center',
     paddingHorizontal: spacing.lg,
   },
-  googleButton: {
-    alignItems: 'center',
-    backgroundColor: colors.background,
-    borderColor: colors.border,
-    borderRadius: borderRadius.lg,
-    borderWidth: 1,
-    elevation: 2,
-    flexDirection: 'row',
-    justifyContent: 'center',
-    paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.md,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-  },
   googleButtonDisabled: {
     opacity: 0.7,
-  },
-  googleButtonText: {
-    color: colors.text.primary,
-    fontSize: typography.sizes.md,
-    fontWeight: typography.weights.semibold,
   },
   googleIconText: {
     color: '#4285F4',
@@ -172,29 +145,10 @@ const styles = StyleSheet.create({
     fontWeight: typography.weights.bold,
     marginRight: spacing.sm,
   },
-  legalLink: {
-    color: colors.primary,
-    textDecorationLine: 'underline',
-  },
   legalSection: {
     bottom: spacing.lg,
     paddingHorizontal: spacing.xl,
     position: 'absolute',
-  },
-  legalText: {
-    color: colors.text.muted,
-    fontSize: typography.sizes.xs,
-    lineHeight: 18,
-    textAlign: 'center',
-  },
-  logoContainer: {
-    alignItems: 'center',
-    backgroundColor: colors.primary + '15',
-    borderRadius: 40,
-    height: 80,
-    justifyContent: 'center',
-    marginBottom: spacing.md,
-    width: 80,
   },
   logoEmoji: {
     fontSize: 40,
@@ -203,14 +157,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginTop: spacing.md,
     paddingVertical: spacing.sm,
-  },
-  skipButtonText: {
-    color: colors.text.secondary,
-    fontSize: typography.sizes.sm,
-  },
-  tagline: {
-    color: colors.text.secondary,
-    fontSize: typography.sizes.md,
   },
   valueIcon: {
     fontSize: 24,
@@ -226,8 +172,71 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.lg,
   },
   valueText: {
-    color: colors.text.primary,
     flex: 1,
     fontSize: typography.sizes.md,
   },
 });
+
+/* eslint-disable react-native/no-unused-styles */
+const createThemedStyles = (colors: ThemeColors) =>
+  StyleSheet.create({
+    appName: {
+      color: colors.text.primary,
+      fontSize: 32,
+      fontWeight: typography.weights.bold,
+      marginBottom: spacing.xs,
+    },
+    container: {
+      backgroundColor: colors.background,
+      flex: 1,
+    },
+    googleButton: {
+      alignItems: 'center',
+      backgroundColor: colors.background,
+      borderColor: colors.border,
+      borderRadius: borderRadius.lg,
+      borderWidth: 1,
+      elevation: 2,
+      flexDirection: 'row',
+      justifyContent: 'center',
+      paddingHorizontal: spacing.lg,
+      paddingVertical: spacing.md,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.1,
+      shadowRadius: 4,
+    },
+    googleButtonText: {
+      color: colors.text.primary,
+      fontSize: typography.sizes.md,
+      fontWeight: typography.weights.semibold,
+    },
+    legalLink: {
+      color: colors.primary,
+      textDecorationLine: 'underline',
+    },
+    legalText: {
+      color: colors.text.muted,
+      fontSize: typography.sizes.xs,
+      lineHeight: 18,
+      textAlign: 'center',
+    },
+    logoContainer: {
+      alignItems: 'center',
+      backgroundColor: colors.primary + '15',
+      borderRadius: 40,
+      height: 80,
+      justifyContent: 'center',
+      marginBottom: spacing.md,
+      width: 80,
+    },
+    skipButtonText: {
+      color: colors.text.secondary,
+      fontSize: typography.sizes.sm,
+    },
+    tagline: {
+      color: colors.text.secondary,
+      fontSize: typography.sizes.md,
+    },
+  });
+/* eslint-enable react-native/no-unused-styles */

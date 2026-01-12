@@ -1,16 +1,10 @@
 import React, { useRef, useCallback, useState, useEffect, memo } from 'react';
 import { StyleSheet, View, ActivityIndicator, Text, TouchableOpacity } from 'react-native';
-import MapLibreGL from '@maplibre/maplibre-react-native';
-import { colors, spacing, borderRadius, typography, MAP_CONFIG } from '@/constants';
+import RNMapView, { Region, PROVIDER_GOOGLE, MapStyleElement } from 'react-native-maps';
+import { spacing, borderRadius, typography, MAP_CONFIG } from '@/constants';
+import { useTheme } from '@/features/theme';
 import { Field, Coordinates } from '@/types';
 import { FieldMarker } from './FieldMarker';
-
-// Initialize MapLibre
-MapLibreGL.setAccessToken(null);
-
-// Clean, modern map style (similar to Google Maps)
-// Using OpenFreeMap Positron - clean, light style
-const MAP_STYLE = 'https://tiles.openfreemap.org/styles/positron';
 
 interface MapViewProps {
   fields: Field[];
@@ -18,7 +12,8 @@ interface MapViewProps {
   isLoadingLocation: boolean;
   onFieldSelect: (field: Field) => void;
   selectedFieldId?: string | null;
-  onRegionChange?: (region: { latitude: number; longitude: number }) => void;
+  onRegionChange?: (region: Region) => void;
+  customMapStyle?: MapStyleElement[];
 }
 
 function MapViewComponent({
@@ -28,18 +23,23 @@ function MapViewComponent({
   onFieldSelect,
   selectedFieldId,
   onRegionChange,
+  customMapStyle,
 }: MapViewProps) {
-  const cameraRef = useRef<MapLibreGL.CameraRef>(null);
+  const mapRef = useRef<RNMapView>(null);
   const [isMapReady, setIsMapReady] = useState(false);
+  const { colors } = useTheme();
 
   // Center map on user location when it becomes available
   useEffect(() => {
-    if (userLocation && isMapReady && cameraRef.current) {
-      cameraRef.current.setCamera({
-        centerCoordinate: [userLocation.longitude, userLocation.latitude],
-        zoomLevel: 14,
-        animationDuration: 1000,
-      });
+    if (userLocation && isMapReady && mapRef.current) {
+      mapRef.current.animateToRegion(
+        {
+          latitude: userLocation.latitude,
+          longitude: userLocation.longitude,
+          ...MAP_CONFIG.userLocationDelta,
+        },
+        1000
+      );
     }
   }, [userLocation, isMapReady]);
 
@@ -48,50 +48,49 @@ function MapViewComponent({
   }, []);
 
   const handleCenterOnUser = useCallback(() => {
-    if (userLocation && cameraRef.current) {
-      cameraRef.current.setCamera({
-        centerCoordinate: [userLocation.longitude, userLocation.latitude],
-        zoomLevel: 14,
-        animationDuration: 500,
-      });
+    if (userLocation && mapRef.current) {
+      mapRef.current.animateToRegion(
+        {
+          latitude: userLocation.latitude,
+          longitude: userLocation.longitude,
+          ...MAP_CONFIG.userLocationDelta,
+        },
+        500
+      );
     }
   }, [userLocation]);
 
-  const handleRegionDidChange = useCallback(
-    (feature: GeoJSON.Feature<GeoJSON.Point>) => {
-      if (feature.geometry.type === 'Point') {
-        const [longitude, latitude] = feature.geometry.coordinates;
-        onRegionChange?.({ latitude, longitude });
-      }
+  const handleRegionChangeComplete = useCallback(
+    (region: Region) => {
+      onRegionChange?.(region);
     },
     [onRegionChange]
   );
 
-  const defaultCenter: [number, number] = userLocation
-    ? [userLocation.longitude, userLocation.latitude]
-    : [MAP_CONFIG.defaultRegion.longitude, MAP_CONFIG.defaultRegion.latitude];
-
-  const defaultZoom = userLocation ? 14 : 10;
+  const initialRegion = userLocation
+    ? {
+        latitude: userLocation.latitude,
+        longitude: userLocation.longitude,
+        ...MAP_CONFIG.userLocationDelta,
+      }
+    : MAP_CONFIG.defaultRegion;
 
   return (
     <View style={styles.container}>
-      <MapLibreGL.MapView
+      <RNMapView
+        ref={mapRef}
+        provider={PROVIDER_GOOGLE}
         style={styles.map}
-        mapStyle={MAP_STYLE}
-        logoEnabled={false}
-        attributionEnabled={true}
-        attributionPosition={{ bottom: 8, right: 8 }}
-        onDidFinishLoadingMap={handleMapReady}
-        onRegionDidChange={handleRegionDidChange}
+        initialRegion={initialRegion}
+        showsUserLocation={true}
+        showsMyLocationButton={false}
+        showsCompass={true}
+        showsScale={true}
+        toolbarEnabled={false}
+        onMapReady={handleMapReady}
+        onRegionChangeComplete={handleRegionChangeComplete}
+        customMapStyle={customMapStyle}
       >
-        <MapLibreGL.Camera
-          ref={cameraRef}
-          defaultSettings={{
-            centerCoordinate: defaultCenter,
-            zoomLevel: defaultZoom,
-          }}
-        />
-        <MapLibreGL.UserLocation visible={true} />
         {fields.map((field) => (
           <FieldMarker
             key={field.id}
@@ -100,25 +99,27 @@ function MapViewComponent({
             onPress={onFieldSelect}
           />
         ))}
-      </MapLibreGL.MapView>
+      </RNMapView>
 
       {/* Center on user location button */}
       {userLocation && (
         <TouchableOpacity
-          style={styles.centerButton}
+          style={[styles.centerButton, { backgroundColor: colors.background }]}
           onPress={handleCenterOnUser}
           activeOpacity={0.8}
         >
-          <Text style={styles.centerButtonIcon}>📍</Text>
+          <Text style={styles.centerButtonIcon}>🎯</Text>
         </TouchableOpacity>
       )}
 
       {/* Loading indicator */}
       {isLoadingLocation && (
         <View style={styles.loadingOverlay}>
-          <View style={styles.loadingContainer}>
+          <View style={[styles.loadingContainer, { backgroundColor: colors.background }]}>
             <ActivityIndicator size="small" color={colors.primary} />
-            <Text style={styles.loadingText}>Finding your location...</Text>
+            <Text style={[styles.loadingText, { color: colors.text.secondary }]}>
+              Finding your location...
+            </Text>
           </View>
         </View>
       )}
@@ -129,7 +130,6 @@ function MapViewComponent({
 const styles = StyleSheet.create({
   centerButton: {
     alignItems: 'center',
-    backgroundColor: colors.background,
     borderRadius: 24,
     bottom: spacing.xl,
     elevation: 4,
@@ -151,7 +151,6 @@ const styles = StyleSheet.create({
   },
   loadingContainer: {
     alignItems: 'center',
-    backgroundColor: colors.background,
     borderRadius: borderRadius.full,
     elevation: 3,
     flexDirection: 'row',
@@ -170,7 +169,6 @@ const styles = StyleSheet.create({
     top: spacing.xl,
   },
   loadingText: {
-    color: colors.text.secondary,
     fontSize: typography.sizes.sm,
     marginLeft: spacing.sm,
   },

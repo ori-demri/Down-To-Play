@@ -1,7 +1,7 @@
-import React, { useCallback, memo } from 'react';
-import { View, StyleSheet, TouchableOpacity } from 'react-native';
+import React, { useState, useCallback, memo } from 'react';
+import { View, StyleSheet } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import MapLibreGL from '@maplibre/maplibre-react-native';
+import { Marker } from 'react-native-maps';
 import { Field, SurfaceType } from '@/types';
 
 interface FieldMarkerProps {
@@ -56,6 +56,7 @@ const getSurfaceIconName = (
 };
 
 function FieldMarkerComponent({ field, isSelected = false, onPress }: FieldMarkerProps) {
+  const [tracksChanges, setTracksChanges] = useState(true);
   const markerColor = getSurfaceColor(field.surface_type);
   const iconName = getSurfaceIconName(field.surface_type);
 
@@ -64,34 +65,41 @@ function FieldMarkerComponent({ field, isSelected = false, onPress }: FieldMarke
     onPress(field);
   }, [field, onPress]);
 
-  // MapLibre uses [longitude, latitude] format
-  const coordinate: [number, number] = [field.coordinates.longitude, field.coordinates.latitude];
+  // Delay turning off tracksViewChanges to ensure icon renders
+  // Using a longer delay to ensure MaterialCommunityIcons fully loads
+  const handleLayout = useCallback(() => {
+    setTimeout(() => setTracksChanges(false), 1500);
+  }, []);
 
   return (
-    <MapLibreGL.MarkerView coordinate={coordinate} anchor={{ x: 0.5, y: 1 }}>
-      <TouchableOpacity onPress={handlePress} activeOpacity={0.8}>
-        <View style={styles.markerWrapper}>
-          <View style={[styles.markerContainer, isSelected && styles.markerContainerSelected]}>
-            <View
-              style={[
-                styles.iconBackground,
-                { backgroundColor: markerColor },
-                isSelected && styles.iconBackgroundSelected,
-              ]}
-            >
-              <MaterialCommunityIcons name={iconName} size={isSelected ? 16 : 14} color="#FFFFFF" />
-            </View>
-          </View>
+    <Marker
+      coordinate={field.coordinates}
+      onPress={handlePress}
+      anchor={{ x: 0.5, y: 1 }}
+      tracksViewChanges={tracksChanges}
+      onLayout={handleLayout}
+    >
+      <View style={styles.markerWrapper}>
+        <View style={[styles.markerContainer, isSelected && styles.markerContainerSelected]}>
           <View
             style={[
-              styles.pointer,
-              { borderTopColor: markerColor },
-              isSelected && styles.pointerSelected,
+              styles.iconBackground,
+              { backgroundColor: markerColor },
+              isSelected && styles.iconBackgroundSelected,
             ]}
-          />
+          >
+            <MaterialCommunityIcons name={iconName} size={isSelected ? 16 : 14} color="#FFFFFF" />
+          </View>
         </View>
-      </TouchableOpacity>
-    </MapLibreGL.MarkerView>
+        <View
+          style={[
+            styles.pointer,
+            { borderTopColor: markerColor },
+            isSelected && styles.pointerSelected,
+          ]}
+        />
+      </View>
+    </Marker>
   );
 }
 

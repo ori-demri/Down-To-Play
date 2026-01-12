@@ -1,11 +1,10 @@
 import React, { useRef, useState, useCallback, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
-import MapLibreGL from '@maplibre/maplibre-react-native';
-import { colors, spacing, borderRadius, typography, MAP_CONFIG } from '@/constants';
-import { Coordinates } from '@/types';
-
-// Clean, modern map style (same as MapView)
-const MAP_STYLE = 'https://tiles.openfreemap.org/styles/positron';
+import RNMapView, { Region, PROVIDER_GOOGLE } from 'react-native-maps';
+import { FieldMarker } from '@/components/map/FieldMarker';
+import { spacing, borderRadius, typography, MAP_CONFIG } from '@/constants';
+import { useTheme } from '@/features/theme';
+import { Coordinates, Field } from '@/types';
 
 interface LocationPickerProps {
   value: Coordinates;
@@ -13,6 +12,7 @@ interface LocationPickerProps {
   userLocation: Coordinates | null;
   error?: string;
   isLoadingLocation?: boolean;
+  fields?: Field[];
 }
 
 export function LocationPicker({
@@ -21,19 +21,24 @@ export function LocationPicker({
   userLocation,
   error,
   isLoadingLocation = false,
+  fields = [],
 }: LocationPickerProps) {
-  const cameraRef = useRef<MapLibreGL.CameraRef>(null);
+  const mapRef = useRef<RNMapView>(null);
+  const { colors, mapStyle } = useTheme();
   const [isMapReady, setIsMapReady] = useState(false);
 
   // Center on user location when it becomes available and value is not set
   useEffect(() => {
     if (userLocation && isMapReady && value.latitude === 0 && value.longitude === 0) {
       onChange(userLocation);
-      cameraRef.current?.setCamera({
-        centerCoordinate: [userLocation.longitude, userLocation.latitude],
-        zoomLevel: 14,
-        animationDuration: 500,
-      });
+      mapRef.current?.animateToRegion(
+        {
+          latitude: userLocation.latitude,
+          longitude: userLocation.longitude,
+          ...MAP_CONFIG.userLocationDelta,
+        },
+        500
+      );
     }
   }, [userLocation, isMapReady, value, onChange]);
 
@@ -41,62 +46,73 @@ export function LocationPicker({
     setIsMapReady(true);
   }, []);
 
-  const handleRegionDidChange = useCallback(
-    (feature: GeoJSON.Feature<GeoJSON.Point>) => {
-      if (feature.geometry.type === 'Point') {
-        const [longitude, latitude] = feature.geometry.coordinates;
-        onChange({
-          latitude,
-          longitude,
-        });
-      }
+  const handleRegionChangeComplete = useCallback(
+    (region: Region) => {
+      onChange({
+        latitude: region.latitude,
+        longitude: region.longitude,
+      });
     },
     [onChange]
   );
 
   const handleCenterOnUser = useCallback(() => {
-    if (userLocation && cameraRef.current) {
+    if (userLocation && mapRef.current) {
       onChange(userLocation);
-      cameraRef.current.setCamera({
-        centerCoordinate: [userLocation.longitude, userLocation.latitude],
-        zoomLevel: 14,
-        animationDuration: 500,
-      });
+      mapRef.current.animateToRegion(
+        {
+          latitude: userLocation.latitude,
+          longitude: userLocation.longitude,
+          ...MAP_CONFIG.userLocationDelta,
+        },
+        500
+      );
     }
   }, [userLocation, onChange]);
 
-  const defaultCenter: [number, number] =
+  const initialRegion =
     value.latitude !== 0
-      ? [value.longitude, value.latitude]
+      ? {
+          latitude: value.latitude,
+          longitude: value.longitude,
+          ...MAP_CONFIG.userLocationDelta,
+        }
       : userLocation
-        ? [userLocation.longitude, userLocation.latitude]
-        : [MAP_CONFIG.defaultRegion.longitude, MAP_CONFIG.defaultRegion.latitude];
-
-  const defaultZoom = value.latitude !== 0 || userLocation ? 14 : 10;
+        ? {
+            latitude: userLocation.latitude,
+            longitude: userLocation.longitude,
+            ...MAP_CONFIG.userLocationDelta,
+          }
+        : MAP_CONFIG.defaultRegion;
 
   return (
     <View style={styles.container}>
-      <Text style={styles.label}>Field Location *</Text>
-      <Text style={styles.hint}>Drag the map to position the pin on the field location</Text>
+      <Text style={[styles.label, { color: colors.text.primary }]}>Field Location *</Text>
+      <Text style={[styles.hint, { color: colors.text.secondary }]}>
+        Drag the map to position the pin on the field location
+      </Text>
 
-      <View style={styles.mapContainer}>
-        <MapLibreGL.MapView
+      <View style={[styles.mapContainer, { borderColor: colors.border }]}>
+        <RNMapView
+          ref={mapRef}
+          provider={PROVIDER_GOOGLE}
           style={styles.map}
-          mapStyle={MAP_STYLE}
-          logoEnabled={false}
-          attributionEnabled={false}
-          onDidFinishLoadingMap={handleMapReady}
-          onRegionDidChange={handleRegionDidChange}
+          initialRegion={initialRegion}
+          showsUserLocation={true}
+          showsMyLocationButton={false}
+          onMapReady={handleMapReady}
+          onRegionChangeComplete={handleRegionChangeComplete}
+          customMapStyle={mapStyle}
         >
-          <MapLibreGL.Camera
-            ref={cameraRef}
-            defaultSettings={{
-              centerCoordinate: defaultCenter,
-              zoomLevel: defaultZoom,
-            }}
-          />
-          <MapLibreGL.UserLocation visible={true} />
-        </MapLibreGL.MapView>
+          {fields.map((field) => (
+            <FieldMarker
+              key={field.id}
+              field={field}
+              isSelected={false}
+              onPress={() => undefined}
+            />
+          ))}
+        </RNMapView>
 
         {/* Center pin indicator */}
         <View style={styles.pinContainer} pointerEvents="none">
@@ -109,7 +125,7 @@ export function LocationPicker({
         {/* Center on user button */}
         {userLocation && (
           <TouchableOpacity
-            style={styles.centerButton}
+            style={[styles.centerButton, { backgroundColor: colors.background }]}
             onPress={handleCenterOnUser}
             activeOpacity={0.8}
           >
@@ -119,18 +135,22 @@ export function LocationPicker({
 
         {/* Loading overlay */}
         {isLoadingLocation && (
-          <View style={styles.loadingOverlay}>
+          <View style={[styles.loadingOverlay, { backgroundColor: colors.overlay }]}>
             <ActivityIndicator size="small" color={colors.primary} />
-            <Text style={styles.loadingText}>Getting location...</Text>
+            <Text style={[styles.loadingText, { color: colors.text.inverse }]}>
+              Getting location...
+            </Text>
           </View>
         )}
       </View>
 
       {/* Coordinates display */}
       {value.latitude !== 0 && (
-        <View style={styles.coordinatesContainer}>
-          <Text style={styles.coordinatesLabel}>Selected coordinates:</Text>
-          <Text style={styles.coordinates}>
+        <View style={[styles.coordinatesContainer, { backgroundColor: colors.surface }]}>
+          <Text style={[styles.coordinatesLabel, { color: colors.text.secondary }]}>
+            Selected coordinates:
+          </Text>
+          <Text style={[styles.coordinates, { color: colors.text.primary }]}>
             {value.latitude.toFixed(6)}, {value.longitude.toFixed(6)}
           </Text>
         </View>
@@ -144,7 +164,6 @@ export function LocationPicker({
 const styles = StyleSheet.create({
   centerButton: {
     alignItems: 'center',
-    backgroundColor: colors.background,
     borderRadius: 22,
     bottom: spacing.sm,
     elevation: 4,
@@ -165,58 +184,53 @@ const styles = StyleSheet.create({
     marginBottom: spacing.md,
   },
   coordinates: {
-    color: colors.text.secondary,
     fontFamily: 'monospace',
     fontSize: typography.sizes.xs,
   },
   coordinatesContainer: {
     alignItems: 'center',
+    borderRadius: borderRadius.sm,
     flexDirection: 'row',
     marginTop: spacing.sm,
     paddingHorizontal: spacing.sm,
+    paddingVertical: spacing.xs,
   },
   coordinatesLabel: {
-    color: colors.text.muted,
     fontSize: typography.sizes.xs,
     marginRight: spacing.xs,
   },
   error: {
-    color: colors.error,
+    color: '#EF4444', // Keep error color static
     fontSize: typography.sizes.sm,
     marginTop: spacing.xs,
   },
   hint: {
-    color: colors.text.muted,
     fontSize: typography.sizes.sm,
     marginBottom: spacing.sm,
   },
   label: {
-    color: colors.text.primary,
     fontSize: typography.sizes.sm,
     fontWeight: typography.weights.medium,
     marginBottom: spacing.xs,
   },
   loadingOverlay: {
     alignItems: 'center',
+    borderRadius: borderRadius.md,
+    justifyContent: 'center',
     left: 0,
+    paddingVertical: spacing.md,
     position: 'absolute',
     right: 0,
     top: spacing.sm,
   },
   loadingText: {
-    backgroundColor: colors.background,
-    borderRadius: borderRadius.sm,
-    color: colors.text.secondary,
     fontSize: typography.sizes.xs,
     marginTop: spacing.xs,
-    paddingHorizontal: spacing.sm,
-    paddingVertical: spacing.xs,
   },
   map: {
     flex: 1,
   },
   mapContainer: {
-    borderColor: colors.border,
     borderRadius: borderRadius.lg,
     borderWidth: 1,
     height: 250,

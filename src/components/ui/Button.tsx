@@ -7,7 +7,8 @@ import {
   ViewStyle,
   TextStyle,
 } from 'react-native';
-import { colors, spacing, borderRadius, typography } from '@/constants';
+import { spacing, borderRadius, typography, ThemeColors } from '@/constants';
+import { useTheme, useThemedStyles } from '@/features/theme';
 
 interface ButtonProps {
   title: string;
@@ -32,13 +33,15 @@ export const Button = memo(function Button({
   style,
   textStyle,
 }: ButtonProps) {
+  const { colors, isDark } = useTheme();
+  const themedStyles = useThemedStyles(createThemedStyles, isDark);
   const isDisabled = disabled || loading;
 
   return (
     <TouchableOpacity
       style={[
         styles.base,
-        styles[variant],
+        themedStyles[variant],
         styles[`${size}Size`],
         isDisabled && styles.disabled,
         style,
@@ -58,7 +61,7 @@ export const Button = memo(function Button({
           <Text
             style={[
               styles.text,
-              styles[`${variant}Text`],
+              themedStyles[`${variant}Text`],
               styles[`${size}Text`],
               icon ? styles.textWithIcon : null,
               textStyle,
@@ -82,12 +85,6 @@ const styles = StyleSheet.create({
   disabled: {
     opacity: 0.5,
   },
-  ghost: {
-    backgroundColor: 'transparent',
-  },
-  ghostText: {
-    color: colors.primary,
-  },
   largeSize: {
     paddingHorizontal: spacing.xl,
     paddingVertical: spacing.md + 2,
@@ -101,26 +98,6 @@ const styles = StyleSheet.create({
   },
   mediumText: {
     fontSize: typography.sizes.md,
-  },
-  outline: {
-    backgroundColor: 'transparent',
-    borderColor: colors.primary,
-    borderWidth: 1.5,
-  },
-  outlineText: {
-    color: colors.primary,
-  },
-  primary: {
-    backgroundColor: colors.primary,
-  },
-  primaryText: {
-    color: colors.text.inverse,
-  },
-  secondary: {
-    backgroundColor: colors.surface,
-  },
-  secondaryText: {
-    color: colors.text.primary,
   },
   smallSize: {
     paddingHorizontal: spacing.md,
@@ -136,3 +113,35 @@ const styles = StyleSheet.create({
     marginLeft: spacing.sm,
   },
 });
+
+/* eslint-disable react-native/no-unused-styles */
+const createThemedStyles = (colors: ThemeColors) =>
+  StyleSheet.create({
+    ghost: {
+      backgroundColor: 'transparent',
+    },
+    ghostText: {
+      color: colors.primary,
+    },
+    outline: {
+      backgroundColor: 'transparent',
+      borderColor: colors.primary,
+      borderWidth: 1.5,
+    },
+    outlineText: {
+      color: colors.primary,
+    },
+    primary: {
+      backgroundColor: colors.primary,
+    },
+    primaryText: {
+      color: colors.text.inverse,
+    },
+    secondary: {
+      backgroundColor: colors.surface,
+    },
+    secondaryText: {
+      color: colors.text.primary,
+    },
+  });
+/* eslint-enable react-native/no-unused-styles */

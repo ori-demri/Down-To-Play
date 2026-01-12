@@ -1,6 +1,7 @@
 import React, { Component, ErrorInfo, ReactNode } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { colors, spacing, borderRadius, typography } from '@/constants';
+import { spacing, borderRadius, typography, ThemeColors } from '@/constants';
+import { useTheme, useThemedStyles } from '@/features/theme';
 import { appLogger } from '@/utils/logger';
 
 interface Props {
@@ -25,6 +26,35 @@ function isExpoUpdatesError(error: Error | null): boolean {
     message.includes('Failed to download remote update') ||
     message.includes('java.io.IOException') ||
     message.includes('IOException')
+  );
+}
+
+/**
+ * Themed fallback UI component
+ */
+function ErrorFallbackUI({ error, onRetry }: { error: Error | null; onRetry: () => void }) {
+  const { isDark } = useTheme();
+  const themedStyles = useThemedStyles(createThemedStyles, isDark);
+
+  return (
+    <View style={themedStyles.container}>
+      <View style={styles.content}>
+        <Text style={styles.emoji}>😕</Text>
+        <Text style={themedStyles.title}>Something went wrong</Text>
+        <Text style={themedStyles.message}>
+          We&apos;re sorry, but something unexpected happened. Please try again.
+        </Text>
+        {__DEV__ && error && (
+          <View style={themedStyles.errorDetails}>
+            <Text style={themedStyles.errorTitle}>Error Details:</Text>
+            <Text style={themedStyles.errorText}>{error.message}</Text>
+          </View>
+        )}
+        <TouchableOpacity style={themedStyles.button} onPress={onRetry}>
+          <Text style={themedStyles.buttonText}>Try Again</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
   );
 }
 
@@ -85,27 +115,8 @@ export class ErrorBoundary extends Component<Props, State> {
         return this.props.fallback;
       }
 
-      // Default fallback UI
-      return (
-        <View style={styles.container}>
-          <View style={styles.content}>
-            <Text style={styles.emoji}>😕</Text>
-            <Text style={styles.title}>Something went wrong</Text>
-            <Text style={styles.message}>
-              We&apos;re sorry, but something unexpected happened. Please try again.
-            </Text>
-            {__DEV__ && this.state.error && (
-              <View style={styles.errorDetails}>
-                <Text style={styles.errorTitle}>Error Details:</Text>
-                <Text style={styles.errorText}>{this.state.error.message}</Text>
-              </View>
-            )}
-            <TouchableOpacity style={styles.button} onPress={this.handleRetry}>
-              <Text style={styles.buttonText}>Try Again</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      );
+      // Default fallback UI with theme support
+      return <ErrorFallbackUI error={this.state.error} onRetry={this.handleRetry} />;
     }
 
     return this.props.children;
@@ -113,24 +124,6 @@ export class ErrorBoundary extends Component<Props, State> {
 }
 
 const styles = StyleSheet.create({
-  button: {
-    backgroundColor: colors.primary,
-    borderRadius: borderRadius.md,
-    paddingHorizontal: spacing.xl,
-    paddingVertical: spacing.md,
-  },
-  buttonText: {
-    color: colors.text.inverse,
-    fontSize: typography.sizes.md,
-    fontWeight: typography.weights.semibold,
-  },
-  container: {
-    alignItems: 'center',
-    backgroundColor: colors.background,
-    flex: 1,
-    justifyContent: 'center',
-    padding: spacing.lg,
-  },
   content: {
     alignItems: 'center',
     maxWidth: 300,
@@ -139,36 +132,60 @@ const styles = StyleSheet.create({
     fontSize: 64,
     marginBottom: spacing.md,
   },
-  errorDetails: {
-    backgroundColor: colors.error + '15',
-    borderRadius: borderRadius.md,
-    marginBottom: spacing.lg,
-    padding: spacing.md,
-    width: '100%',
-  },
-  errorText: {
-    color: colors.error,
-    fontFamily: 'monospace',
-    fontSize: typography.sizes.xs,
-  },
-  errorTitle: {
-    color: colors.error,
-    fontSize: typography.sizes.sm,
-    fontWeight: typography.weights.semibold,
-    marginBottom: spacing.xs,
-  },
-  message: {
-    color: colors.text.secondary,
-    fontSize: typography.sizes.md,
-    lineHeight: 22,
-    marginBottom: spacing.lg,
-    textAlign: 'center',
-  },
-  title: {
-    color: colors.text.primary,
-    fontSize: typography.sizes.xl,
-    fontWeight: typography.weights.bold,
-    marginBottom: spacing.sm,
-    textAlign: 'center',
-  },
 });
+
+/* eslint-disable react-native/no-unused-styles */
+const createThemedStyles = (colors: ThemeColors) =>
+  StyleSheet.create({
+    button: {
+      backgroundColor: colors.primary,
+      borderRadius: borderRadius.md,
+      paddingHorizontal: spacing.xl,
+      paddingVertical: spacing.md,
+    },
+    buttonText: {
+      color: colors.text.inverse,
+      fontSize: typography.sizes.md,
+      fontWeight: typography.weights.semibold,
+    },
+    container: {
+      alignItems: 'center',
+      backgroundColor: colors.background,
+      flex: 1,
+      justifyContent: 'center',
+      padding: spacing.lg,
+    },
+    errorDetails: {
+      backgroundColor: colors.error + '15',
+      borderRadius: borderRadius.md,
+      marginBottom: spacing.lg,
+      padding: spacing.md,
+      width: '100%',
+    },
+    errorText: {
+      color: colors.error,
+      fontFamily: 'monospace',
+      fontSize: typography.sizes.xs,
+    },
+    errorTitle: {
+      color: colors.error,
+      fontSize: typography.sizes.sm,
+      fontWeight: typography.weights.semibold,
+      marginBottom: spacing.xs,
+    },
+    message: {
+      color: colors.text.secondary,
+      fontSize: typography.sizes.md,
+      lineHeight: 22,
+      marginBottom: spacing.lg,
+      textAlign: 'center',
+    },
+    title: {
+      color: colors.text.primary,
+      fontSize: typography.sizes.xl,
+      fontWeight: typography.weights.bold,
+      marginBottom: spacing.sm,
+      textAlign: 'center',
+    },
+  });
+/* eslint-enable react-native/no-unused-styles */

@@ -5,16 +5,20 @@
 
 import React from 'react';
 import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
-import { colors, spacing, typography } from '@/constants';
+import { spacing, typography, ThemeColors } from '@/constants';
+import { useTheme, useThemedStyles } from '@/features/theme';
 
 export function LoadingScreen() {
+  const { colors, isDark } = useTheme();
+  const themedStyles = useThemedStyles(createThemedStyles, isDark);
+
   return (
-    <View style={styles.container}>
+    <View style={themedStyles.container}>
       <View style={styles.content}>
-        <View style={styles.logoContainer}>
+        <View style={themedStyles.logoContainer}>
           <Text style={styles.logoEmoji}>⚽</Text>
         </View>
-        <Text style={styles.appName}>Down To Play</Text>
+        <Text style={themedStyles.appName}>Down To Play</Text>
         <ActivityIndicator size="large" color={colors.primary} style={styles.spinner} />
       </View>
     </View>
@@ -22,29 +26,10 @@ export function LoadingScreen() {
 }
 
 const styles = StyleSheet.create({
-  appName: {
-    color: colors.text.primary,
-    fontSize: typography.sizes.xl,
-    fontWeight: typography.weights.bold,
-    marginBottom: spacing.lg,
-  },
-  container: {
-    backgroundColor: colors.background,
-    flex: 1,
-  },
   content: {
     alignItems: 'center',
     flex: 1,
     justifyContent: 'center',
-  },
-  logoContainer: {
-    alignItems: 'center',
-    backgroundColor: colors.primary + '15',
-    borderRadius: 40,
-    height: 80,
-    justifyContent: 'center',
-    marginBottom: spacing.md,
-    width: 80,
   },
   logoEmoji: {
     fontSize: 40,
@@ -53,3 +38,28 @@ const styles = StyleSheet.create({
     marginTop: spacing.md,
   },
 });
+
+/* eslint-disable react-native/no-unused-styles */
+const createThemedStyles = (colors: ThemeColors) =>
+  StyleSheet.create({
+    appName: {
+      color: colors.text.primary,
+      fontSize: typography.sizes.xl,
+      fontWeight: typography.weights.bold,
+      marginBottom: spacing.lg,
+    },
+    container: {
+      backgroundColor: colors.background,
+      flex: 1,
+    },
+    logoContainer: {
+      alignItems: 'center',
+      backgroundColor: colors.primary + '15',
+      borderRadius: 40,
+      height: 80,
+      justifyContent: 'center',
+      marginBottom: spacing.md,
+      width: 80,
+    },
+  });
+/* eslint-enable react-native/no-unused-styles */

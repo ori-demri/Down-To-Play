@@ -7,7 +7,8 @@ import {
   TextInputProps as RNTextInputProps,
   ViewStyle,
 } from 'react-native';
-import { colors, spacing, borderRadius, typography } from '@/constants';
+import { spacing, borderRadius, typography, ThemeColors } from '@/constants';
+import { useTheme, useThemedStyles } from '@/features/theme';
 
 interface TextInputProps extends Omit<RNTextInputProps, 'style'> {
   label?: string;
@@ -28,20 +29,22 @@ export function TextInput({
   ...props
 }: TextInputProps) {
   const [isFocused, setIsFocused] = useState(false);
+  const { colors, isDark } = useTheme();
+  const themedStyles = useThemedStyles(createThemedStyles, isDark);
 
   return (
     <View style={[styles.container, containerStyle]}>
       {label && (
-        <Text style={styles.label}>
+        <Text style={themedStyles.label}>
           {label}
-          {required && <Text style={styles.required}> *</Text>}
+          {required && <Text style={themedStyles.required}> *</Text>}
         </Text>
       )}
       <RNTextInput
         style={[
-          styles.input,
-          isFocused && styles.inputFocused,
-          error && styles.inputError,
+          themedStyles.input,
+          isFocused && themedStyles.inputFocused,
+          error && themedStyles.inputError,
           props.multiline && styles.inputMultiline,
           inputStyle,
         ]}
@@ -56,8 +59,8 @@ export function TextInput({
         }}
         {...props}
       />
-      {error && <Text style={styles.error}>{error}</Text>}
-      {hint && !error && <Text style={styles.hint}>{hint}</Text>}
+      {error && <Text style={themedStyles.error}>{error}</Text>}
+      {hint && !error && <Text style={themedStyles.hint}>{hint}</Text>}
     </View>
   );
 }
@@ -66,44 +69,50 @@ const styles = StyleSheet.create({
   container: {
     marginBottom: spacing.md,
   },
-  error: {
-    color: colors.error,
-    fontSize: typography.sizes.sm,
-    marginTop: spacing.xs,
-  },
-  hint: {
-    color: colors.text.muted,
-    fontSize: typography.sizes.sm,
-    marginTop: spacing.xs,
-  },
-  input: {
-    backgroundColor: colors.surface,
-    borderColor: colors.border,
-    borderRadius: borderRadius.md,
-    borderWidth: 1,
-    color: colors.text.primary,
-    fontSize: typography.sizes.md,
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.md,
-  },
-  inputError: {
-    borderColor: colors.error,
-  },
-  inputFocused: {
-    backgroundColor: colors.background,
-    borderColor: colors.primary,
-  },
   inputMultiline: {
     minHeight: 100,
     textAlignVertical: 'top',
   },
-  label: {
-    color: colors.text.primary,
-    fontSize: typography.sizes.sm,
-    fontWeight: typography.weights.medium,
-    marginBottom: spacing.xs,
-  },
-  required: {
-    color: colors.error,
-  },
 });
+
+/* eslint-disable react-native/no-unused-styles */
+const createThemedStyles = (colors: ThemeColors) =>
+  StyleSheet.create({
+    error: {
+      color: colors.error,
+      fontSize: typography.sizes.sm,
+      marginTop: spacing.xs,
+    },
+    hint: {
+      color: colors.text.muted,
+      fontSize: typography.sizes.sm,
+      marginTop: spacing.xs,
+    },
+    input: {
+      backgroundColor: colors.surface,
+      borderColor: colors.border,
+      borderRadius: borderRadius.md,
+      borderWidth: 1,
+      color: colors.text.primary,
+      fontSize: typography.sizes.md,
+      paddingHorizontal: spacing.md,
+      paddingVertical: spacing.md,
+    },
+    inputError: {
+      borderColor: colors.error,
+    },
+    inputFocused: {
+      backgroundColor: colors.background,
+      borderColor: colors.primary,
+    },
+    label: {
+      color: colors.text.primary,
+      fontSize: typography.sizes.sm,
+      fontWeight: typography.weights.medium,
+      marginBottom: spacing.xs,
+    },
+    required: {
+      color: colors.error,
+    },
+  });
+/* eslint-enable react-native/no-unused-styles */

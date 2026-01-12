@@ -128,3 +128,26 @@ export const appLogger = createLogger('App');
 export const fieldLogger = createLogger('Field');
 export const mapLogger = createLogger('Map');
 export const storageLogger = createLogger('Storage');
+
+/**
+ * Extract error message from various error types
+ * Handles standard Error objects, Supabase errors, and plain objects
+ */
+export function getErrorMessage(error: unknown): string {
+  if (error instanceof Error) {
+    return error.message;
+  }
+  if (typeof error === 'object' && error !== null) {
+    // Handle Supabase/PostgrestError which has message property
+    if ('message' in error && typeof (error as { message: unknown }).message === 'string') {
+      return (error as { message: string }).message;
+    }
+    // Try to stringify the object
+    try {
+      return JSON.stringify(error);
+    } catch {
+      return String(error);
+    }
+  }
+  return String(error);
+}
